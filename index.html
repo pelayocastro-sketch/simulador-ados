@@ -1528,7 +1528,16 @@
 
     function nextScreen() { if (currentScreen < 6) { currentScreen++; updateScreen(); } }
     function prevScreen() { if (currentScreen > 0) { currentScreen--; updateScreen(); } }
-    function scheduleDemo() { window.open('https://ados.solutions', '_blank'); }
+    function scheduleDemo() {
+      // Opción 1: Google Calendar (si tiene Google Calendar public)
+      const calendarLink = 'https://calendar.google.com/calendar/u/0/r/eventedit?text=Demo%20ADOS%20Simulador&details=Simulación%3A%20' + state.volume.informes + '%20informes%20%2B%20' + state.volume.procesos + '%20procesos%20%3D%20' + fmt(calcAnnualSavings()) + '%20UF%20de%20ahorro&add=pelayo@ados.solutions';
+      
+      // Opción 2: Crear evento por email (mailto con icalendar)
+      const emailLink = 'mailto:pelayo@ados.solutions?subject=Agendar%20Demo%20-%20ADOS%20Simulador&body=Hola%20Pelayo%2C%0A%0AMe%20gustaría%20agendar%20una%20demo%20para%20mi%20simulación:%0A%0AVolumen:%20' + state.volume.informes + '%20informes%20%2B%20' + state.volume.procesos + '%20procesos%0AAhorro%20Año%201:%20' + fmt(calcAnnualSavings()) + '%20UF%20(%24' + Math.round(calcAnnualSavings() * UF_VALUE).toLocaleString('es-CL') + ')%0A%0A¿Cuándo tienes disponibilidad%3F%0A%0ASaludos';
+      
+      // Intentar Google Calendar primero
+      window.open(calendarLink, '_blank');
+    }
 
     function downloadSimulation() {
       const pdfContent = `
