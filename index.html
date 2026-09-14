@@ -1531,44 +1531,86 @@
     function scheduleDemo() { window.open('https://ados.solutions', '_blank'); }
 
     function downloadSimulation() {
-      const data = `ADOS Simulador - Simulación de costos
-Fecha: ${new Date().toLocaleDateString('es-CL')}
+      const pdfContent = `
+        <style>
+          body { font-family: 'Space Grotesk', sans-serif; color: #0E1013; }
+          .pdf-header { text-align: center; border-bottom: 3px solid #33D98B; padding-bottom: 20px; margin-bottom: 30px; }
+          .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+          .logo-symbol { width: 16px; height: 16px; background: #33D98B; transform: rotate(45deg); border-radius: 2px; }
+          .logo-text { font-size: 16px; font-weight: 700; letter-spacing: 2px; }
+          h1 { font-size: 28px; margin: 15px 0; }
+          .subtitle { font-size: 12px; color: #9BA1A6; }
+          .section { margin: 30px 0; }
+          .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9BA1A6; border-left: 3px solid #33D98B; padding-left: 8px; margin-bottom: 15px; }
+          .metric { display: flex; gap: 15px; margin-bottom: 15px; }
+          .metric-card { flex: 1; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 6px; padding: 15px; }
+          .metric-label { font-size: 10px; text-transform: uppercase; color: #9BA1A6; margin-bottom: 8px; }
+          .metric-value { font-size: 24px; font-weight: 700; color: #33D98B; }
+          table { width: 100%; border-collapse: collapse; font-size: 11px; }
+          th { background: #F9FAFB; border: 1px solid #E5E7EB; padding: 10px; text-align: left; font-weight: 700; text-transform: uppercase; color: #9BA1A6; }
+          td { border: 1px solid #E5E7EB; padding: 10px; }
+          .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #E5E7EB; text-align: center; font-size: 10px; color: #9BA1A6; }
+        </style>
+        <div class="pdf-header">
+          <div class="logo">
+            <div class="logo-symbol"></div>
+            <span class="logo-text">ADOS</span>
+          </div>
+          <h1>Simulación de Costos</h1>
+          <p class="subtitle">Análisis comparativo de tu operación legal</p>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">Resumen Ejecutivo</div>
+          <div class="metric">
+            <div class="metric-card">
+              <div class="metric-label">Ahorro Año 1</div>
+              <div class="metric-value">${fmt(calcAnnualSavings())} UF</div>
+              <div style="font-size: 11px; color: #9BA1A6;">${fmtClp(calcAnnualSavings() * UF_VALUE)}</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Porcentaje</div>
+              <div class="metric-value">${calcSavingsPercent().toFixed(1)}%</div>
+              <div style="font-size: 11px; color: #9BA1A6;">vs proveedor actual</div>
+            </div>
+          </div>
+        </div>
 
-VOLUMEN DE OPERACIONES
-Informes sin contrato: ${state.volume.informes}/mes
-Procesos con contrato: ${state.volume.procesos}/mes
+        <div class="section">
+          <div class="section-title">Tu Operación</div>
+          <table>
+            <tr><th>Concepto</th><th style="text-align: right;">Cantidad</th></tr>
+            <tr><td>Informes sin contrato</td><td style="text-align: right;">${state.volume.informes}/mes</td></tr>
+            <tr><td>Procesos con contrato</td><td style="text-align: right;">${state.volume.procesos}/mes</td></tr>
+          </table>
+        </div>
 
-TU PROVEEDOR ACTUAL
-─ Costos base
-  Informe: ${fmt(state.provider.informe)} UF
-  Proceso: ${fmt(state.provider.proceso)} UF
+        <div class="section">
+          <div class="section-title">Comparación de Costos</div>
+          <table>
+            <tr><th>Concepto</th><th style="text-align: right;">ADOS</th><th style="text-align: right;">Tu Proveedor</th></tr>
+            <tr><td>Costo mensual</td><td style="text-align: right;">${fmt(calcMonthlyRecurringADOS())} UF</td><td style="text-align: right;">${fmt(calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider())} UF</td></tr>
+            <tr><td>Costo anual (Año 1)</td><td style="text-align: right;">${fmt(calcYear1ADOS())} UF</td><td style="text-align: right;">${fmt(calcYear1Provider())} UF</td></tr>
+            <tr><td>Costo anual (Año 2+)</td><td style="text-align: right;">${fmt(calcYear2ADOS())} UF</td><td style="text-align: right;">${fmt(calcYear2Provider())} UF</td></tr>
+          </table>
+        </div>
 
-─ Costos únicos
-  Implementación: ${state.provider.hasImpl ? fmt(state.provider.impl) + ' UF' : 'No'}
-  Configuración documento: ${state.provider.hasDocConfig ? fmt(state.provider.docConfigCost) + ' UF' : 'No'}
-
-─ Costos por proceso
-  Documentos adicionales: ${state.provider.hasDocUsage ? `${fmt(state.provider.docUsageCost)} UF × ${fmt(state.provider.docQty)} docs` : 'No'}
-
-ADOS — Modelo de precios
-Informe: ${fmt(ADOS_PRICING.informe)} UF
-Proceso: ${fmt(ADOS_PRICING.proceso)} UF (incluye contrato, personería, UAF, PEP, Anexos, Carta Poder, etc)
-Implementación: No
-Documentos adicionales: No (incluidos)
-
-RESULTADO DE LA SIMULACIÓN
-Costo mensual (Proveedor): ${fmt(calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider())} UF
-Costo mensual (ADOS): ${fmt(calcMonthlyRecurringADOS())} UF
-Ahorro Año 1: ${fmt(calcAnnualSavings())} UF (${calcSavingsPercent().toFixed(1)}%)
-
-Nota: Simulación referencial. Agendar demo en ados.solutions para validar.`;
+        <div class="footer">
+          <p><strong>ADOS</strong> — Personería, resuelta.<br>
+          Generado el ${new Date().toLocaleDateString('es-CL')} | Resultados referenciales<br>
+          <strong>ados.solutions</strong></p>
+        </div>
+      `;
       
-      const blob = new Blob([data], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'ADOS_Simulador_Simulation.txt';
-      a.click();
+      const opt = {
+        margin: 10,
+        filename: 'ADOS_Simulacion_${new Date().getTime()}.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      };
+      
+      html2pdf().set(opt).from(pdfContent).save();
     }
 
     function shareSimulation() {
@@ -1582,5 +1624,8 @@ Nota: Simulación referencial. Agendar demo en ados.solutions para validar.`;
 
     updateScreen();
   </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 </body>
 </html>
