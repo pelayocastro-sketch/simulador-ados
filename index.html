@@ -1614,11 +1614,97 @@
     }
 
     function shareSimulation() {
-      const text = `ADOS Simulador: ${state.volume.informes} informes + ${state.volume.procesos} procesos = ${fmt(calcAnnualSavings())} UF de ahorro año 1 (${fmtClp(calcAnnualSavings() * UF_VALUE)})`;
+      const pdfContent = `
+        <style>
+          body { font-family: 'Space Grotesk', sans-serif; color: #0E1013; margin: 0; padding: 20px; }
+          .pdf-header { text-align: center; border-bottom: 3px solid #33D98B; padding-bottom: 20px; margin-bottom: 30px; }
+          .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+          .logo-symbol { width: 16px; height: 16px; background: #33D98B; transform: rotate(45deg); border-radius: 2px; }
+          .logo-text { font-size: 16px; font-weight: 700; letter-spacing: 2px; }
+          h1 { font-size: 28px; margin: 15px 0; }
+          .subtitle { font-size: 12px; color: #9BA1A6; }
+          .section { margin: 30px 0; }
+          .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9BA1A6; border-left: 3px solid #33D98B; padding-left: 8px; margin-bottom: 15px; }
+          .metric { display: flex; gap: 15px; margin-bottom: 15px; }
+          .metric-card { flex: 1; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 6px; padding: 15px; }
+          .metric-label { font-size: 10px; text-transform: uppercase; color: #9BA1A6; margin-bottom: 8px; }
+          .metric-value { font-size: 24px; font-weight: 700; color: #33D98B; }
+          table { width: 100%; border-collapse: collapse; font-size: 11px; }
+          th { background: #F9FAFB; border: 1px solid #E5E7EB; padding: 10px; text-align: left; font-weight: 700; text-transform: uppercase; color: #9BA1A6; }
+          td { border: 1px solid #E5E7EB; padding: 10px; }
+          .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #E5E7EB; text-align: center; font-size: 10px; color: #9BA1A6; }
+        </style>
+        <div class="pdf-header">
+          <div class="logo">
+            <div class="logo-symbol"></div>
+            <span class="logo-text">ADOS</span>
+          </div>
+          <h1>Simulación de Costos</h1>
+          <p class="subtitle">Análisis comparativo de tu operación legal</p>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">Resumen Ejecutivo</div>
+          <div class="metric">
+            <div class="metric-card">
+              <div class="metric-label">Ahorro Año 1</div>
+              <div class="metric-value">${fmt(calcAnnualSavings())} UF</div>
+              <div style="font-size: 11px; color: #9BA1A6;">${fmtClp(calcAnnualSavings() * UF_VALUE)}</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Porcentaje</div>
+              <div class="metric-value">${calcSavingsPercent().toFixed(1)}%</div>
+              <div style="font-size: 11px; color: #9BA1A6;">vs proveedor actual</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Tu Operación</div>
+          <table>
+            <tr><th>Concepto</th><th style="text-align: right;">Cantidad</th></tr>
+            <tr><td>Informes sin contrato</td><td style="text-align: right;">${state.volume.informes}/mes</td></tr>
+            <tr><td>Procesos con contrato</td><td style="text-align: right;">${state.volume.procesos}/mes</td></tr>
+          </table>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Comparación de Costos</div>
+          <table>
+            <tr><th>Concepto</th><th style="text-align: right;">ADOS</th><th style="text-align: right;">Tu Proveedor</th></tr>
+            <tr><td>Costo mensual</td><td style="text-align: right;">${fmt(calcMonthlyRecurringADOS())} UF</td><td style="text-align: right;">${fmt(calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider())} UF</td></tr>
+            <tr><td>Costo anual (Año 1)</td><td style="text-align: right;">${fmt(calcYear1ADOS())} UF</td><td style="text-align: right;">${fmt(calcYear1Provider())} UF</td></tr>
+            <tr><td>Costo anual (Año 2+)</td><td style="text-align: right;">${fmt(calcYear2ADOS())} UF</td><td style="text-align: right;">${fmt(calcYear2Provider())} UF</td></tr>
+          </table>
+        </div>
+
+        <div class="footer">
+          <p><strong>ADOS</strong> — Personería, resuelta.<br>
+          Simulación generada el ${new Date().toLocaleDateString('es-CL')}<br>
+          <strong>ados.solutions</strong></p>
+        </div>
+      `;
+      
+      const opt = {
+        margin: 10,
+        filename: `ADOS_Simulacion_${state.volume.informes}inf_${state.volume.procesos}proc.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      };
+      
+      // Generar PDF
+      html2pdf().set(opt).from(pdfContent).save();
+      
+      // Intentar compartir mediante Web Share API si está disponible
       if (navigator.share) {
-        navigator.share({ title: 'ADOS Simulador', text: text });
-      } else {
-        alert(text);
+        const shareText = `ADOS Simulador: ${state.volume.informes} informes + ${state.volume.procesos} procesos = ${fmt(calcAnnualSavings())} UF de ahorro año 1 (${fmtClp(calcAnnualSavings() * UF_VALUE)}) | ados.solutions`;
+        navigator.share({
+          title: 'ADOS Simulación',
+          text: shareText
+        }).catch(() => {
+          // Si falla, solo mostrar que el PDF se está descargando
+        });
       }
     }
 
