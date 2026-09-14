@@ -4,7 +4,11 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ADOS Simulador">
+  <meta name="theme-color" content="#0E1013">
   <title>ADOS Simulador</title>
   
   <style>
@@ -865,6 +869,298 @@
 
     .footer a:hover {
       text-decoration: underline;
+    }
+
+
+    @media (max-width: 768px) {
+      body {
+        font-size: 14px;
+      }
+      .container {
+        padding: 24px 16px;
+        max-width: 100%;
+      }
+
+      .header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+      }
+
+      .header-left {
+        gap: 12px;
+      }
+
+      .logo {
+        font-size: 12px;
+      }
+
+      .logo-badge {
+        display: none;
+      }
+
+      .header-link {
+        font-size: 12px;
+      }
+
+      .progress-bar {
+        gap: 6px;
+      }
+
+      .progress-step {
+        height: 2px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      h2 {
+        font-size: 28px;
+        margin-bottom: 12px;
+      }
+
+      .screen-intro {
+        padding: 60px 24px;
+        border-radius: 12px;
+      }
+
+      .intro-logo {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      .intro-subtitle {
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+
+      .btn-primary {
+        padding: 12px 24px;
+        font-size: 13px;
+        width: 100%;
+      }
+
+      .volume-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .volume-card {
+        padding: 24px 16px;
+      }
+
+      .volume-value {
+        font-size: 36px;
+        min-width: 80px;
+      }
+
+      .volume-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+
+      .input-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .input-field {
+        padding: 20px;
+      }
+
+      .toggle-section {
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+
+      .toggle-row {
+        padding: 12px;
+        margin-bottom: 8px;
+      }
+
+      .toggle-label {
+        font-size: 13px;
+      }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .comparison-card {
+        padding: 24px;
+      }
+
+      .comparison-amount {
+        font-size: 36px;
+      }
+
+      .savings-hero {
+        padding: 40px 24px;
+        margin-bottom: 32px;
+      }
+
+      .savings-amount {
+        font-size: 48px;
+      }
+
+      .savings-clp {
+        font-size: 14px;
+      }
+
+      .savings-percent {
+        font-size: 24px;
+      }
+
+      .cost-summary {
+        padding: 20px;
+      }
+
+      .cost-summary-row {
+        padding: 12px 0;
+        font-size: 13px;
+      }
+
+      .accordion-header {
+        padding: 16px;
+        font-size: 13px;
+      }
+
+      .accordion-content {
+        padding: 16px;
+      }
+
+      .breakdown-table {
+        font-size: 12px;
+      }
+
+      .breakdown-table th {
+        padding: 8px;
+        font-size: 9px;
+      }
+
+      .breakdown-table td {
+        padding: 8px;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 40px;
+        padding-top: 20px;
+      }
+
+      .btn-nav {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 13px;
+      }
+
+      .cta-final {
+        padding: 40px 20px;
+        border-radius: 12px;
+      }
+
+      .cta-title {
+        font-size: 14px;
+      }
+
+      .cta-amount {
+        font-size: 40px;
+      }
+
+      .cta-subtitle {
+        font-size: 13px;
+      }
+
+      .cta-buttons {
+        gap: 10px;
+      }
+
+      .cta-buttons .btn-primary,
+      .cta-buttons .btn-secondary {
+        width: 100%;
+        padding: 12px;
+      }
+
+      .cta-disclaimer {
+        font-size: 10px;
+      }
+
+      .footer {
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 16px;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+
+      .screen-intro {
+        padding: 40px 16px;
+      }
+
+      .volume-card-label {
+        font-size: 10px;
+      }
+
+      .volume-value {
+        font-size: 28px;
+      }
+
+      .comparison-amount {
+        font-size: 28px;
+      }
+
+      .savings-amount {
+        font-size: 36px;
+      }
+
+      .cta-amount {
+        font-size: 32px;
+      }
+    }
+
+    /* Optimizaciones touch */
+    @media (hover: none) and (pointer: coarse) {
+      .btn-primary,
+      .btn-secondary,
+      .btn-nav,
+      .volume-btn,
+      .toggle-row {
+        min-height: 48px;
+        min-width: 48px;
+      }
+
+      button {
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
+
+    /* iPhone safe area */
+    @supports (padding: max(0px)) {
+      .container {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+        padding-top: max(16px, env(safe-area-inset-top));
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+      }
     }
 
     @media (max-width: 1024px) {
