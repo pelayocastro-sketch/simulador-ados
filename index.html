@@ -615,51 +615,6 @@
     }
 
     /* COST SUMMARY */
-    .cost-summary {
-      background: var(--bg-light);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      padding: 36px;
-      margin-bottom: 50px;
-    }
-
-    .cost-summary-title {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--ados-text-secondary);
-      margin-bottom: 24px;
-    }
-
-    .cost-summary-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border-light);
-      font-size: 14px;
-    }
-
-    .cost-summary-row:last-child {
-      border-bottom: none;
-    }
-
-    .cost-summary-label {
-      color: var(--ados-text-secondary);
-    }
-
-    .cost-summary-value {
-      font-size: 16px;
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--ados-tinta);
-    }
-
-    .cost-summary-value.highlight {
-      color: var(--ados-verde);
-    }
-
     /* BREAKDOWN */
     .accordion {
       background: white;
@@ -1182,34 +1137,6 @@
           <div class="savings-percent" id="savings-percent">19.0%</div>
         </div>
 
-        <div class="cost-summary">
-          <div class="cost-summary-title">Desglose por período</div>
-          <div class="cost-summary-row">
-            <span class="cost-summary-label">Costo mensual ADOS</span>
-            <span class="cost-summary-value" id="summary-ados-monthly">30.5 UF</span>
-          </div>
-          <div class="cost-summary-row">
-            <span class="cost-summary-label">Costo mensual proveedor</span>
-            <span class="cost-summary-value" id="summary-prov-monthly">35.0 UF</span>
-          </div>
-          <div class="cost-summary-row">
-            <span class="cost-summary-label">Total Año 1 (ADOS)</span>
-            <span class="cost-summary-value" id="summary-ados-year1">366 UF</span>
-          </div>
-          <div class="cost-summary-row">
-            <span class="cost-summary-label">Total Año 1 (Proveedor)</span>
-            <span class="cost-summary-value" id="summary-prov-year1">452 UF</span>
-          </div>
-          <div class="cost-summary-row">
-            <span class="cost-summary-label">Desde Año 2 (ADOS)</span>
-            <span class="cost-summary-value" id="summary-ados-year2">366 UF</span>
-          </div>
-          <div class="cost-summary-row">
-            <span class="cost-summary-label">Desde Año 2 (Proveedor)</span>
-            <span class="cost-summary-value" id="summary-prov-year2">420 UF</span>
-          </div>
-        </div>
-
         <div class="nav-buttons">
           <button class="btn-nav" onclick="prevScreen()">← Atrás</button>
           <button class="btn-nav primary" onclick="nextScreen()">Ver desglose →</button>
@@ -1634,13 +1561,6 @@
       document.getElementById('savings-amount').textContent = fmt(savings) + ' UF';
       document.getElementById('savings-clp').textContent = `≈ ${fmtClp(savings * UF_VALUE)}`;
       document.getElementById('savings-percent').textContent = savingsPercent.toFixed(1) + '%';
-
-      document.getElementById('summary-ados-monthly').textContent = fmt(adosMonthly) + ' UF';
-      document.getElementById('summary-prov-monthly').textContent = fmt(provTotalMonthly) + ' UF';
-      document.getElementById('summary-ados-year1').textContent = fmt(adosYear1) + ' UF';
-      document.getElementById('summary-prov-year1').textContent = fmt(provYear1) + ' UF';
-      document.getElementById('summary-ados-year2').textContent = fmt(adosYear2) + ' UF';
-      document.getElementById('summary-prov-year2').textContent = fmt(provYear2) + ' UF';
 
       const adosInformes = state.volume.informes * ADOS_PRICING.informe;
       const adosProcesos = state.volume.procesos * ADOS_PRICING.proceso;
