@@ -56,6 +56,13 @@
     .chart-wrapper { margin-bottom: 24px; }
     .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #33D98B; }
     canvas { max-width: 100%; }
+
+    .mode-selector { display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid #333; }
+    .mode-btn { flex: 1; padding: 14px; border: 2px solid #33D98B; border-radius: 8px; background: transparent; color: #ccc; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+    .mode-btn.active { background: #33D98B; color: #0E1013; }
+    .mode-btn:hover { opacity: 0.8; }
+    .advanced-fields { display: none; }
+    .advanced-fields.show { display: block; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -153,7 +160,13 @@
     <div style="margin-top: 50px;">
       <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
       <button class="btn btn-secondary" onclick="gotoStart()">Nueva simulación
-    <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="previewPDF()">📄 Vista Previa PDF</button></button>
+    <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="previewPDF()">📄 Vista Previa PDF</button>
+
+    <div class="mode-selector">
+      <button class="mode-btn active" id="btn-completo" onclick="setMode('completo')">📋 Modo Completo</button>
+      <button class="mode-btn" id="btn-rapido" onclick="setMode('rapido')">⚡ Modo Rápido</button>
+    </div>
+</button>
     
     
     <div class="saved-quotes">
@@ -414,6 +427,25 @@
     });
   }
 
+
+  let mode = 'completo';
+
+  function setMode(newMode) {
+    mode = newMode;
+    document.getElementById('btn-completo').classList.toggle('active', mode === 'completo');
+    document.getElementById('btn-rapido').classList.toggle('active', mode === 'rapido');
+    
+    // En modo rápido, podríamos simplificar la interfaz
+    // Por ahora solo cambia el modo
+    localStorage.setItem('ados-mode', mode);
+  }
+
+  // Inicializar modo
+  function initMode() {
+    mode = localStorage.getItem('ados-mode') || 'completo';
+    setMode(mode);
+  }
+
   function validateInputs() {
     const info = parseInt(document.getElementById('informes').value) || 0;
     const proc = parseInt(document.getElementById('procesos').value) || 0;
@@ -540,6 +572,7 @@
   window.addEventListener('DOMContentLoaded', function() {
     initDarkMode();
     updateSavedQuotesList();
+    initMode();
     updateScreen();
   });
 
