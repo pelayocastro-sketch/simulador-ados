@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ADOS Simulador</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='20' y='20' width='60' height='60' rx='8' fill='%2322C579'/%3E%3Crect x='35' y='35' width='30' height='30' rx='4' fill='white'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='25' y='25' width='50' height='50' rx='8' fill='%2333D98B' transform='rotate(45 50 50)'/%3E%3C/svg%3E">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -1647,33 +1647,63 @@
       const savings = calcAnnualSavings();
       const savingsPercent = calcSavingsPercent();
       
-      return `
-        <div style="font-family: Arial, sans-serif;">
-          <h2 style="color: #33D98B; margin-bottom: 20px;">Cotización ADOS Simulador</h2>
-          <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CL')}</p>
+      const html = `
+        <div style="font-family: 'Arial', sans-serif; padding: 20px; background: white;">
+          <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #33D98B; padding-bottom: 20px;">
+            <div style="font-size: 20px; font-weight: bold; color: #33D98B; margin-bottom: 10px;">ADOS SIMULADOR</div>
+            <div style="font-size: 14px; color: #666;">Cotización de Ahorro</div>
+          </div>
           
-          <h3 style="margin-top: 20px; margin-bottom: 12px; font-size: 14px;">Volumen de Operaciones</h3>
-          <p>Informes: ${state.volume.informes} | Procesos: ${state.volume.procesos}</p>
+          <p style="margin-bottom: 20px;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CL')} | <strong>Hora:</strong> ${new Date().toLocaleTimeString('es-CL')}</p>
           
-          <h3 style="margin-top: 20px; margin-bottom: 12px; font-size: 14px;">Comparativa</h3>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 8px;"><strong>Tu Proveedor (Mensual):</strong></td>
-              <td style="padding: 8px; text-align: right;">${fmt(provMonthly)} UF</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #ddd;">
-              <td style="padding: 8px;"><strong>ADOS (Mensual):</strong></td>
-              <td style="padding: 8px; text-align: right;">${fmt(adosMonthly)} UF</td>
-            </tr>
-            <tr style="background: #e8f9f2;">
-              <td style="padding: 8px;"><strong>Tu Ahorro Año 1:</strong></td>
-              <td style="padding: 8px; text-align: right; color: #33D98B; font-weight: bold;">${fmt(savings)} UF (${savingsPercent.toFixed(1)}%)</td>
-            </tr>
-          </table>
-          
-          <p style="margin-top: 20px; font-size: 12px; color: #999;">Simulación referencial. Agendar demo para validar.</p>
+          <div style="margin: 20px 0;">
+            <h3 style="font-size: 13px; font-weight: bold; color: #0E1013; margin-bottom: 10px;">📊 VOLUMEN DE OPERACIONES</h3>
+            <p style="margin: 5px 0; font-size: 12px;">• Informes sin contrato: <strong>${state.volume.informes}/mes</strong></p>
+            <p style="margin: 5px 0; font-size: 12px;">• Procesos con contrato: <strong>${state.volume.procesos}/mes</strong></p>
+          </div>
+
+          <div style="margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 6px; border-left: 3px solid #ddd;">
+            <h3 style="font-size: 13px; font-weight: bold; color: #0E1013; margin-bottom: 10px;">💰 TU PROVEEDOR ACTUAL</h3>
+            <table style="width: 100%; font-size: 12px;">
+              <tr><td>Costo Mensual:</td><td style="text-align: right;"><strong>${fmt(provMonthly)} UF</strong></td></tr>
+              <tr><td>Costo Anual (Año 1):</td><td style="text-align: right;"><strong>${fmt(provYear1)} UF</strong></td></tr>
+            </table>
+          </div>
+
+          <div style="margin: 20px 0; background: #e8f9f2; padding: 15px; border-radius: 6px; border-left: 3px solid #33D98B;">
+            <h3 style="font-size: 13px; font-weight: bold; color: #33D98B; margin-bottom: 10px;">✨ ADOS — Modelo de Precios</h3>
+            <table style="width: 100%; font-size: 12px;">
+              <tr><td>Costo Mensual:</td><td style="text-align: right;"><strong>${fmt(adosMonthly)} UF</strong></td></tr>
+              <tr><td>Costo Anual (Año 1):</td><td style="text-align: right;"><strong>${fmt(adosYear1)} UF</strong></td></tr>
+            </table>
+          </div>
+
+          <div style="margin: 20px 0; background: #fff9e6; padding: 15px; border-radius: 6px; border: 2px solid #FFD700;">
+            <h3 style="font-size: 14px; font-weight: bold; color: #0E1013; margin-bottom: 10px;">🎯 TU AHORRO AÑO 1</h3>
+            <div style="font-size: 20px; color: #33D98B; font-weight: bold; text-align: center;">
+              ${fmt(savings)} UF
+            </div>
+            <div style="font-size: 16px; font-weight: bold; text-align: center; color: #33D98B; margin-top: 8px;">
+              ${savingsPercent.toFixed(1)}% de ahorro
+            </div>
+            <div style="font-size: 12px; color: #666; text-align: center; margin-top: 10px;">
+              ≈ ${fmtClp(savings * UF_VALUE)} pesos chilenos
+            </div>
+          </div>
+
+          <div style="margin: 30px 0; padding-top: 20px; border-top: 1px solid #ddd;">
+            <p style="font-size: 11px; color: #999; text-align: center;">
+              Simulación referencial. Agendar demo en ados.solutions para validar datos y estructura de precios.
+            </p>
+            <p style="font-size: 11px; color: #999; text-align: center; margin-top: 10px;">
+              Generated by ADOS Simulador • ${new Date().toISOString().split('T')[0]}
+            </p>
+          </div>
         </div>
       `;
+      
+      document.getElementById('pdf-modal-body').innerHTML = html;
+      return html;
     }
     
     function downloadPDF() {
@@ -1914,55 +1944,48 @@
 
     function nextScreen() { if (validateInputs() && currentScreen < 6) { currentScreen++; updateScreen(); } }
     function prevScreen() { if (currentScreen > 0) { currentScreen--; updateScreen(); } }
-    function scheduleDemo() { window.open('https://ados.solutions', '_blank'); }
+    function scheduleDemo() { 
+      window.open('https://calendly.com/pelayo@ados.solutions', '_blank'); 
+    }
 
     function downloadSimulation() {
-      const data = `ADOS Simulador - Simulación de costos
-Fecha: ${new Date().toLocaleDateString('es-CL')}
-
-VOLUMEN DE OPERACIONES
-Informes sin contrato: ${state.volume.informes}/mes
-Procesos con contrato: ${state.volume.procesos}/mes
-
-TU PROVEEDOR ACTUAL
-─ Costos base
-  Informe: ${fmt(state.provider.informe)} UF
-  Proceso: ${fmt(state.provider.proceso)} UF
-
-─ Costos únicos
-  Implementación: ${state.provider.hasImpl ? fmt(state.provider.impl) + ' UF' : 'No'}
-  Configuración documento: ${state.provider.hasDocConfig ? fmt(state.provider.docConfigCost) + ' UF' : 'No'}
-
-─ Costos por proceso
-  Documentos adicionales: ${state.provider.hasDocUsage ? `${fmt(state.provider.docUsageCost)} UF × ${fmt(state.provider.docQty)} docs` : 'No'}
-
-ADOS — Modelo de precios
-Informe: ${fmt(ADOS_PRICING.informe)} UF
-Proceso: ${fmt(ADOS_PRICING.proceso)} UF (incluye contrato, personería, UAF, PEP, Anexos, Carta Poder, etc)
-Implementación: No
-Documentos adicionales: No (incluidos)
-
-RESULTADO DE LA SIMULACIÓN
-Costo mensual (Proveedor): ${fmt(calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider())} UF
-Costo mensual (ADOS): ${fmt(calcMonthlyRecurringADOS())} UF
-Ahorro Año 1: ${fmt(calcAnnualSavings())} UF (${calcSavingsPercent().toFixed(1)}%)
-
-Nota: Simulación referencial. Agendar demo en ados.solutions para validar.`;
+      // Generar contenido del PDF
+      generatePDFContent();
       
-      const blob = new Blob([data], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'ADOS_Simulador_Simulation.txt';
-      a.click();
+      // Descargar como PDF usando html2pdf
+      const element = document.getElementById('pdf-modal-body');
+      const opt = {
+        margin: 10,
+        filename: 'Cotizacion_ADOS_' + state.volume.informes + '_' + state.volume.procesos + '_' + new Date().getTime() + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, logging: false },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      };
+      
+      html2pdf().set(opt).from(element).save().catch(err => {
+        console.error('Error descargando PDF:', err);
+        alert('⚠️ Error al descargar PDF. Intenta de nuevo.');
+      });
     }
 
     function shareSimulation() {
-      const text = `ADOS Simulador: ${state.volume.informes} informes + ${state.volume.procesos} procesos = ${fmt(calcAnnualSavings())} UF de ahorro año 1 (${fmtClp(calcAnnualSavings() * UF_VALUE)})`;
+      const savingsText = fmt(calcAnnualSavings()) + ' UF';
+      const savingsClp = fmtClp(calcAnnualSavings() * UF_VALUE);
+      const text = `🎉 He simulado mis costos legales con ADOS Simulador:\n\n📊 Volumen: ${state.volume.informes} informes + ${state.volume.procesos} procesos\n💰 Ahorro Año 1: ${savingsText} (${savingsClp})\n\n🔗 Simula el tuyo: https://simulador-ados.vercel.app`;
+      
       if (navigator.share) {
-        navigator.share({ title: 'ADOS Simulador', text: text });
+        navigator.share({ 
+          title: 'ADOS Simulador - Mi Cotización',
+          text: text,
+          url: 'https://simulador-ados.vercel.app'
+        }).catch(err => console.log('Share cancelled:', err));
       } else {
-        alert(text);
+        // Fallback: copiar al clipboard
+        navigator.clipboard.writeText(text).then(() => {
+          alert('✅ Mensaje copiado al clipboard. Pégalo en WhatsApp, Email o tu red social favorita.');
+        }).catch(() => {
+          alert('📋 ' + text);
+        });
       }
     }
 
