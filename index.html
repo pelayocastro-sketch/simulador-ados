@@ -1305,6 +1305,7 @@
             <button class="btn-secondary" onclick="previewPDF()">Vista Previa →</button>
           <button class="btn-secondary" onclick="downloadSimulation()">Descargar simulación</button>
             <button class="btn-secondary" onclick="shareSimulation()">Compartir</button>
+          <button class="btn-secondary" onclick="saveQuote()">💾 Guardar cotización</button>
           </div>
 
           <div class="cta-disclaimer">
@@ -1573,6 +1574,32 @@
     
     function updateSavedQuotesList() {
       const list = document.getElementById('saved-quotes-list');
+      const listMain = document.getElementById('saved-quotes-list-main');
+      const html = savedQuotes.length === 0 
+        ? '<p style="color: #9BA1A6; font-size: 12px;">No hay cotizaciones guardadas</p>'
+        : savedQuotes.map(q => `
+          <div class="saved-quote-item">
+            <div>
+              <div class="quote-name">${q.name}</div>
+              <div class="quote-date">${new Date(q.timestamp).toLocaleDateString('es-CL')} ${new Date(q.timestamp).toLocaleTimeString('es-CL')}</div>
+            </div>
+            <div class="quote-actions">
+              <button onclick="loadQuote(${q.id})" class="btn-small">Cargar</button>
+              <button onclick="deleteQuote(${q.id})" class="btn-small btn-danger">Borrar</button>
+            </div>
+          </div>
+        `).join('');
+      
+      if (list) list.innerHTML = html;
+      if (listMain) listMain.innerHTML = html;
+      
+      // Mostrar pantalla de guardadas si existen
+      const screenSaved = document.getElementById('screen-saved');
+      if (screenSaved && savedQuotes.length > 0) {
+        screenSaved.style.display = 'block';
+      }
+    }
+      const list = document.getElementById('saved-quotes-list');
       if (list) {
         if (savedQuotes.length === 0) {
           list.innerHTML = '<p style="color: #9BA1A6; font-size: 12px;">No hay cotizaciones guardadas</p>';
@@ -1592,6 +1619,7 @@
     }
 
     function updateCalcs() {
+    showValidationMessages();
       state.provider.informe = parseFloat(document.getElementById('prov-informe').value) || 0;
       state.provider.proceso = parseFloat(document.getElementById('prov-proceso').value) || 0;
       state.provider.impl = parseFloat(document.getElementById('prov-impl').value) || 0;
