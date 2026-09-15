@@ -915,16 +915,6 @@
     body.dark-mode .saved-quote-item { background: #252b34; }
 
     
-    /* PDF PREVIEW */
-    .pdf-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-    .pdf-modal.show { display: flex; }
-    .pdf-modal-content { background: white; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
-    .pdf-modal-header { padding: 20px; border-bottom: 1px solid #E5E7EB; font-weight: 600; font-size: 16px; }
-    .pdf-modal-body { padding: 24px; font-size: 13px; line-height: 1.6; color: #333; }
-    .pdf-modal-footer { padding: 20px; border-top: 1px solid #E5E7EB; display: flex; gap: 12px; }
-    .pdf-modal-footer button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-    .pdf-download-btn { background: #33D98B; color: white; }
-    .pdf-close-btn { background: #E5E7EB; color: #0E1013; }
 
     
     /* CHARTS */
@@ -944,7 +934,6 @@
     body.dark-mode .mode-btn.active { background: #33D98B; border-color: #33D98B; color: #0E1013; }
 
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
@@ -1383,8 +1372,8 @@
           <button class="btn-nav" onclick="prevScreen()">← Atrás</button>
           <button class="btn-nav primary" onclick="nextScreen()">Continuar →</button>
 
-      <button class="btn-secondary" onclick="previewPDF()" style="margin-top: 12px;">📄 Vista Previa PDF</button>
-      <button class="btn-secondary" onclick="shareSimulation()" style="margin-top: 12px;">📤 Compartir</button>
+      <button class="btn-secondary" onclick="contactForm()" style="margin-top: 12px;">📧 Contactarme</button>
+      <button class="btn-secondary" onclick="scheduleDemo()" style="margin-top: 12px;">📅 Agendar Reunión</button>
       <button class="btn-secondary" onclick="saveCurrentQuote()" style="margin-top: 12px;">💾 Guardar Cotización</button>
         </div>
       </div>
@@ -1497,6 +1486,21 @@
       if (localStorage.getItem('ados-dark-mode') === 'true') {
         document.body.classList.add('dark-mode');
       }
+    }
+
+
+    function contactForm() {
+      const email = prompt('¿Cuál es tu email?', '');
+      if (!email) return;
+      
+      const phone = prompt('¿Cuál es tu teléfono? (opcional)', '');
+      
+      const message = `Quiero ser contactado sobre ADOS Simulador.\nVolumen: ${state.volume.informes} informes + ${state.volume.procesos} procesos\nAhorro: ${fmt(calcAnnualSavings())} UF (${calcSavingsPercent().toFixed(1)}%)\nEmail: ${email}${phone ? '\nTeléfono: ' + phone : ''}`;
+      
+      // Enviar a WhatsApp de ADOS
+      window.open('https://wa.me/56912345678?text=' + encodeURIComponent(message), '_blank');
+      
+      alert('✅ Tu información se ha compartido. Nos contactaremos pronto.');
     }
 
     function validateInputs() {
@@ -1626,168 +1630,9 @@
     }
     
     // MEJORA #4: PDF
-    function previewPDF() {
-      const content = generatePDFContent();
-      const modal = document.getElementById('pdf-modal');
-      if (!modal) return;
-      document.getElementById('pdf-modal-body').innerHTML = content;
-      modal.classList.add('show');
-    }
     
-    function closePDFModal() {
-      const modal = document.getElementById('pdf-modal');
-      if (modal) modal.classList.remove('show');
-    }
     
-    function generatePDFContent() {
-      const adosMonthly = calcMonthlyRecurringADOS();
-      const provMonthly = calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider();
-      const adosYear1 = calcYear1ADOS();
-      const provYear1 = calcYear1Provider();
-      const savings = calcAnnualSavings();
-      const savingsPercent = calcSavingsPercent();
-      
-      const html = `
-        <div style="font-family: 'Arial', sans-serif; padding: 0; background: white; line-height: 1.4;">
-          <!-- HEADER -->
-          <div style="text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #33D98B;">
-            <div style="font-size: 16px; font-weight: bold; letter-spacing: 2px; color: #0E1013;">A D O S</div>
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #0E1013; margin-top: 4px;">S I M U L A C I Ó N D E C O S T O S</div>
-            <div style="font-size: 11px; color: #666; margin-top: 8px;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CL')}</div>
-          </div>
-
-          <!-- TÍTULO INTERNO -->
-          <div style="text-align: center; margin-bottom: 20px;">
-            <div style="font-size: 13px; font-weight: bold; color: #0E1013;">ADOS Simulador —</div>
-            <div style="font-size: 12px; color: #666;">Simulación de costos</div>
-          </div>
-
-          <!-- VOLUMEN -->
-          <div style="margin: 20px 0; padding: 12px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #0E1013; margin-bottom: 8px;">V O L U M E N   D E   O P E R A C I O N E S</div>
-            <table style="width: 100%; font-size: 11px;">
-              <tr>
-                <td><strong>Informes sin contrato</strong></td>
-                <td style="text-align: right;"><strong>${state.volume.informes}/mes</strong></td>
-              </tr>
-              <tr style="height: 6px;"><td colspan="2"></td></tr>
-              <tr>
-                <td><strong>Procesos con contrato</strong></td>
-                <td style="text-align: right;"><strong>${state.volume.procesos}/mes</strong></td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- PROVEEDOR -->
-          <div style="margin: 20px 0; padding: 12px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #0E1013; margin-bottom: 8px;">T U   P R O V E E D O R   A C T U A L</div>
-            
-            <div style="margin-bottom: 10px;">
-              <div style="font-size: 11px; color: #666; margin-bottom: 6px;"><strong>Costos base</strong></div>
-              <table style="width: 100%; font-size: 11px; margin-left: 12px;">
-                <tr>
-                  <td>Informe</td>
-                  <td style="text-align: right;"><strong>${fmt(state.provider.informe)} UF</strong></td>
-                </tr>
-                <tr>
-                  <td>Proceso</td>
-                  <td style="text-align: right;"><strong>${fmt(state.provider.proceso)} UF</strong></td>
-                </tr>
-              </table>
-            </div>
-
-            ${state.provider.hasImpl || state.provider.hasDocConfig ? `
-            <div style="margin-bottom: 10px;">
-              <div style="font-size: 11px; color: #666; margin-bottom: 6px;"><strong>Costos únicos</strong></div>
-              <table style="width: 100%; font-size: 11px; margin-left: 12px;">
-                ${state.provider.hasImpl ? `<tr><td>Implementación</td><td style="text-align: right;"><strong>${fmt(state.provider.impl)} UF</strong></td></tr>` : '<tr><td>Implementación</td><td style="text-align: right;">No</td></tr>'}
-                ${state.provider.hasDocConfig ? `<tr><td>Configuración documento</td><td style="text-align: right;"><strong>${fmt(state.provider.docConfigCost)} UF</strong></td></tr>` : '<tr><td>Configuración documento</td><td style="text-align: right;">No</td></tr>'}
-              </table>
-            </div>
-            ` : ''}
-
-            ${state.provider.hasDocUsage ? `
-            <div>
-              <div style="font-size: 11px; color: #666; margin-bottom: 6px;"><strong>Costos por proceso</strong></div>
-              <table style="width: 100%; font-size: 11px; margin-left: 12px;">
-                <tr>
-                  <td>Documentos adicionales</td>
-                  <td style="text-align: right;"><strong>${fmt(state.provider.docUsageCost)} UF × ${fmt(state.provider.docQty)} docs</strong></td>
-                </tr>
-              </table>
-            </div>
-            ` : ''}
-          </div>
-
-          <!-- ADOS PRICING -->
-          <div style="margin: 20px 0; padding: 12px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #33D98B; margin-bottom: 8px;">A D O S   —   M O D E L O   D E   P R E C I O S</div>
-            <table style="width: 100%; font-size: 11px;">
-              <tr>
-                <td>Informe</td>
-                <td style="text-align: right;"><strong>0,7 UF</strong></td>
-              </tr>
-              <tr>
-                <td>Proceso</td>
-                <td style="text-align: right;"><strong>1,0 UF</strong></td>
-              </tr>
-            </table>
-            <div style="font-size: 10px; color: #666; margin-top: 8px;">Incluye contrato, personería, UAF, PEP, Anexos, Carta Poder, etc.</div>
-            <div style="font-size: 10px; color: #666; margin-top: 4px;">Implementación No</div>
-            <div style="font-size: 10px; color: #666;">Documentos adicionales No (incluidos)</div>
-          </div>
-
-          <!-- RESULTADO -->
-          <div style="margin: 20px 0; padding: 15px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; background: #f9f9f9; padding: 15px;">
-            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #0E1013; margin-bottom: 12px;">R E S U L T A D O   D E   L A   S I M U L A C I Ó N</div>
-            
-            <table style="width: 100%; font-size: 12px;">
-              <tr>
-                <td><strong>Costo mensual (Proveedor)</strong></td>
-                <td style="text-align: right;"><strong>${fmt(provMonthly)} UF</strong></td>
-              </tr>
-              <tr>
-                <td><strong>Costo mensual (ADOS)</strong></td>
-                <td style="text-align: right;"><strong>${fmt(adosMonthly)} UF</strong></td>
-              </tr>
-            </table>
-
-            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd;">
-              <div style="font-size: 11px; color: #666; text-align: center; margin-bottom: 6px;">AHORRO AÑO 1</div>
-              <div style="font-size: 20px; font-weight: bold; color: #33D98B; text-align: center; margin-bottom: 4px;">${fmt(savings)}</div>
-              <div style="font-size: 14px; font-weight: bold; color: #33D98B; text-align: center; margin-bottom: 8px;">UF</div>
-              <div style="font-size: 14px; font-weight: bold; color: #33D98B; text-align: center;">${savingsPercent.toFixed(1)}%</div>
-              <div style="font-size: 11px; color: #999; text-align: center; margin-top: 8px;">≈ ${fmtClp(savings * UF_VALUE)}</div>
-            </div>
-          </div>
-
-          <!-- FOOTER -->
-          <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #ddd; text-align: center;">
-            <div style="font-size: 10px; color: #999;">Nota: Simulación referencial. Agendar demo en ados.solutions para validar.</div>
-            <div style="font-size: 10px; color: #999; margin-top: 8px;">ADOS Simulador · Simulación de costos ${new Date().toLocaleDateString('es-CL')}</div>
-          </div>
-        </div>
-      `;
-      
-      document.getElementById('pdf-modal-body').innerHTML = html;
-      return html;
-    }
     
-    function downloadPDF() {
-      const content = document.getElementById('pdf-modal-body').innerHTML;
-      const element = document.createElement('div');
-      element.innerHTML = content;
-      
-      const opt = {
-        margin: 10,
-        filename: 'Cotizacion_ADOS_' + state.volume.informes + '_' + state.volume.procesos + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-      };
-      
-      html2pdf().set(opt).from(element).save();
-    }
     
     // MEJORA #5: GRÁFICOS
     let chartComparison = null;
@@ -2015,25 +1860,6 @@
       window.open('https://calendly.com/pelayo@ados.solutions', '_blank'); 
     }
 
-    function downloadSimulation() {
-      // Generar contenido del PDF
-      generatePDFContent();
-      
-      // Descargar como PDF usando html2pdf
-      const element = document.getElementById('pdf-modal-body');
-      const opt = {
-        margin: 10,
-        filename: 'Cotizacion_ADOS_' + state.volume.informes + '_' + state.volume.procesos + '_' + new Date().getTime() + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, logging: false },
-        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-      };
-      
-      html2pdf().set(opt).from(element).save().catch(err => {
-        console.error('Error descargando PDF:', err);
-        alert('⚠️ Error al descargar PDF. Intenta de nuevo.');
-      });
-    }
 
     function shareSimulation() {
       const savingsText = fmt(calcAnnualSavings()) + ' UF';
@@ -2062,17 +1888,6 @@
     updateSavedQuotesList();
   </script>
 
-
-  <div class="pdf-modal" id="pdf-modal">
-    <div class="pdf-modal-content">
-      <div class="pdf-modal-header">Vista Previa de tu Cotización</div>
-      <div class="pdf-modal-body" id="pdf-modal-body"></div>
-      <div class="pdf-modal-footer">
-        <button class="pdf-download-btn" onclick="downloadPDF()">Descargar PDF</button>
-        <button class="pdf-close-btn" onclick="closePDFModal()">Cerrar</button>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
