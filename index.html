@@ -2003,7 +2003,7 @@
     }
 
     function shareSimulation() {
-      const pdfContent = 
+      const pdfContent = `
         <style>
           body { font-family: 'Space Grotesk', sans-serif; color: #0E1013; margin: 0; padding: 40px; background: white; }
           .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #E5E7EB; padding-bottom: 20px; }
@@ -2155,8 +2155,7 @@
           </div>
           <div>${new Date().toLocaleDateString('es-CL')}</div>
         </div>
-      `
-;
+      ` ;
       
       const opt = {
         margin: 10,
@@ -2166,20 +2165,23 @@
         jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
       };
       
-      // Generar PDF
+      // Generar y descargar PDF
       html2pdf().set(opt).from(pdfContent).save();
+      
+      // Mensaje en la pantalla
+      alert('📄 PDF descargado: Cotizacion_ADOS_' + state.volume.informes + 'inf_' + state.volume.procesos + 'proc.pdf');
       
       // Intentar compartir mediante Web Share API si está disponible
       if (navigator.share) {
-        const shareText = `ADOS Simulador: ${state.volume.informes} informes + ${state.volume.procesos} procesos = ${fmt(calcAnnualSavings())} UF de ahorro año 1 (${fmtClp(calcAnnualSavings() * UF_VALUE)}) | ados.solutions`;
+        const shareText = `ADOS Simulador: ${state.volume.informes} informes + ${state.volume.procesos} procesos = ${fmt(calcAnnualSavings())} UF de ahorro año 1 (${fmtClp(calcAnnualSavings() * UF_VALUE)}) 📊 ados.solutions`;
         navigator.share({
-          title: 'ADOS Simulación',
+          title: 'Cotizacion ADOS',
           text: shareText
         }).catch(() => {
           // Si falla, solo mostrar que el PDF se está descargando
         });
       }
-    }
+    }    }
 
     updateScreen();
   </script>
