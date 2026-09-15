@@ -51,8 +51,14 @@
     .pdf-modal-btns button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
     .pdf-download { background: #33D98B; color: white; }
     .pdf-close { background: #ccc; color: #0E1013; }
+
+    .charts-container { margin: 24px 0; padding: 24px; background: #1A1E24; border-radius: 8px; }
+    .chart-wrapper { margin-bottom: 24px; }
+    .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #33D98B; }
+    canvas { max-width: 100%; }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
 
@@ -111,6 +117,19 @@
       <p style="font-size: 14px; color: #999;">Costo ADOS: <span id="cost-ados">0</span> UF/mes</p>
     </div>
     
+    
+    
+    <div class="charts-container">
+      <div class="chart-wrapper">
+        <div class="chart-title">📊 Comparativa Mensual vs Anual</div>
+        <canvas id="comparison-chart"></canvas>
+      </div>
+      <div class="chart-wrapper">
+        <div class="chart-title">📈 Ahorro Acumulado (3 Años)</div>
+        <canvas id="accumulative-chart"></canvas>
+      </div>
+    </div>
+
     <div style="margin-top: 50px;">
       <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
       <button class="btn btn-secondary" onclick="nextScreen()">Ver desglose →</button>
@@ -300,6 +319,101 @@
     alert('✅ PDF descargado');
   }
 
+
+  let chartComparison = null;
+  let chartAccumulative = null;
+
+  function destroyCharts() {
+    if (chartComparison) { chartComparison.destroy(); chartComparison = null; }
+    if (chartAccumulative) { chartAccumulative.destroy(); chartAccumulative = null; }
+  }
+
+  function createCharts() {
+    destroyCharts();
+
+    const info = window.informes || 0;
+    const proc = window.procesos || 0;
+    const priceInf = parseFloat(document.getElementById('price-inf').value) || 0;
+    const priceProc = parseFloat(document.getElementById('price-proc').value) || 0;
+
+    const costProvMes = (info * priceInf) + (proc * priceProc);
+    const costProvYear1 = costProvMes * 12;
+    const costAdosMes = (info * 0.7) + (proc * 1.0);
+    const costAdosYear1 = costAdosMes * 12;
+
+    // Gráfico de barras: Comparativa
+    const ctxComp = document.getElementById('comparison-chart').getContext('2d');
+    chartComparison = new Chart(ctxComp, {
+      type: 'bar',
+      data: {
+        labels: ['Costo Mensual (UF)', 'Costo Anual (UF)'],
+        datasets: [
+          {
+            label: 'Tu Proveedor',
+            data: [costProvMes.toFixed(2), costProvYear1.toFixed(2)],
+            backgroundColor: 'rgba(155, 161, 166, 0.6)',
+            borderColor: '#9BA1A6',
+            borderWidth: 2
+          },
+          {
+            label: 'ADOS',
+            data: [costAdosMes.toFixed(2), costAdosYear1.toFixed(2)],
+            backgroundColor: 'rgba(51, 217, 139, 0.6)',
+            borderColor: '#33D98B',
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#ccc', font: { size: 12 } } }
+        },
+        scales: {
+          y: { ticks: { color: '#999' }, grid: { color: '#333' } },
+          x: { ticks: { color: '#999' }, grid: { color: '#333' } }
+        }
+      }
+    });
+
+    // Gráfico de línea: Ahorro acumulado
+    const savingsPerYear = costProvMes - costAdosMes;
+    const ctxAcc = document.getElementById('accumulative-chart').getContext('2d');
+    chartAccumulative = new Chart(ctxAcc, {
+      type: 'line',
+      data: {
+        labels: ['Año 1', 'Año 2', 'Año 3'],
+        datasets: [{
+          label: 'Ahorro Acumulado (UF)',
+          data: [
+            costProvYear1 - costAdosYear1,
+            (costProvYear1 - costAdosYear1) + (costProvMes - costAdosMes) * 12,
+            (costProvYear1 - costAdosYear1) + (costProvMes - costAdosMes) * 24
+          ],
+          borderColor: '#33D98B',
+          backgroundColor: 'rgba(51, 217, 139, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 6,
+          pointBackgroundColor: '#33D98B',
+          pointBorderColor: '#0E1013',
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#ccc', font: { size: 12 } } }
+        },
+        scales: {
+          y: { ticks: { color: '#999' }, grid: { color: '#333' } },
+          x: { ticks: { color: '#999' }, grid: { color: '#333' } }
+        }
+      }
+    });
+  }
+
   function validateInputs() {
     const info = parseInt(document.getElementById('informes').value) || 0;
     const proc = parseInt(document.getElementById('procesos').value) || 0;
@@ -389,6 +503,7 @@
       document.getElementById('detail-ados-anual').textContent = costAdosAnual.toFixed(2);
 
       currentScreen = 3;
+      setTimeout(() => { createCharts(); }, 200);
     } else if (currentScreen === 3) {
       currentScreen = 4;
     } else {
