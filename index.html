@@ -40,7 +40,19 @@
     .quote-btn { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; }
     .quote-load { background: #33D98B; color: white; }
     .quote-delete { background: #ff4444; color: white; }
+
+    .pdf-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+    .pdf-modal.show { display: flex; }
+    .pdf-modal-content { background: white; border-radius: 8px; padding: 20px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .pdf-modal-header { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #0E1013; }
+    .pdf-preview { background: #f5f5f5; padding: 16px; border-radius: 6px; margin-bottom: 16px; max-height: 400px; overflow-y: auto; }
+    .pdf-preview p { margin: 8px 0; font-size: 13px; color: #333; }
+    .pdf-modal-btns { display: flex; gap: 12px; }
+    .pdf-modal-btns button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .pdf-download { background: #33D98B; color: white; }
+    .pdf-close { background: #ccc; color: #0E1013; }
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -121,7 +133,8 @@
     
     <div style="margin-top: 50px;">
       <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
-      <button class="btn btn-secondary" onclick="gotoStart()">Nueva simulación</button>
+      <button class="btn btn-secondary" onclick="gotoStart()">Nueva simulación
+    <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="previewPDF()">📄 Vista Previa PDF</button></button>
     
     
     <div class="saved-quotes">
@@ -210,6 +223,81 @@
     quotes = quotes.filter(q => q.id !== id);
     localStorage.setItem('ados-quotes', JSON.stringify(quotes));
     updateSavedQuotesList();
+  }
+
+
+  function generatePDFContent() {
+    const info = window.informes || 0;
+    const proc = window.procesos || 0;
+    const priceInf = parseFloat(document.getElementById('price-inf').value) || 0;
+    const priceProc = parseFloat(document.getElementById('price-proc').value) || 0;
+
+    const costProvMes = (info * priceInf) + (proc * priceProc);
+    const costProvAnual = costProvMes * 12;
+    const costAdosMes = (info * 0.7) + (proc * 1.0);
+    const costAdosAnual = costAdosMes * 12;
+    const ahorro = costProvAnual - costAdosAnual;
+    const pct = ((ahorro / costProvAnual) * 100).toFixed(1);
+
+    return `
+      <div style="font-family: Arial; color: #333;">
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #33D98B; padding-bottom: 16px;">
+          <div style="font-size: 12px; color: #999;">⚖️ ADOS SIMULADOR</div>
+          <div style="font-size: 24px; font-weight: bold; color: #0E1013;">Cotización de Ahorro</div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+          <p><strong>Tu Volumen:</strong></p>
+          <p>• Informes de Personería: ${info}</p>
+          <p>• Procesos con Contrato: ${proc}</p>
+        </div>
+
+        <div style="margin: 20px 0; background: #f5f5f5; padding: 12px; border-radius: 6px;">
+          <p><strong>Costo Actual (Proveedor):</strong></p>
+          <p>Mensual: ${costProvMes.toFixed(2)} UF</p>
+          <p>Anual (Año 1): ${costProvAnual.toFixed(2)} UF</p>
+        </div>
+
+        <div style="margin: 20px 0; background: #e8f9f2; padding: 12px; border-radius: 6px; border-left: 4px solid #33D98B;">
+          <p><strong>Costo ADOS:</strong></p>
+          <p>Mensual: ${costAdosMes.toFixed(2)} UF</p>
+          <p>Anual (Año 1): ${costAdosAnual.toFixed(2)} UF</p>
+        </div>
+
+        <div style="margin: 20px 0; background: #fff9e6; padding: 12px; border-radius: 6px; border-left: 4px solid #33D98B;">
+          <p><strong>Tu Ahorro Año 1:</strong></p>
+          <p style="font-size: 20px; color: #33D98B; font-weight: bold;">${ahorro.toFixed(2)} UF (${pct}%)</p>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #ddd; font-size: 11px; color: #999;">
+          <p>Simulación referencial. Agendar demo en ados.solutions para validar.</p>
+          <p>Fecha: ${new Date().toLocaleString('es-CL')}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function previewPDF() {
+    const content = generatePDFContent();
+    document.getElementById('pdf-preview-content').innerHTML = content;
+    document.getElementById('pdf-modal').classList.add('show');
+  }
+
+  function closePDFModal() {
+    document.getElementById('pdf-modal').classList.remove('show');
+  }
+
+  function downloadPDF() {
+    const element = document.getElementById('pdf-preview-content');
+    const opt = {
+      margin: 10,
+      filename: 'Cotizacion_ADOS_' + window.informes + '_' + window.procesos + '.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+    html2pdf().set(opt).from(element).save();
+    alert('✅ PDF descargado');
   }
 
   function validateInputs() {
@@ -341,6 +429,18 @@
   });
 
 </script>
+
+
+  <div class="pdf-modal" id="pdf-modal">
+    <div class="pdf-modal-content">
+      <div class="pdf-modal-header">Vista Previa de tu Cotización</div>
+      <div class="pdf-preview" id="pdf-preview-content"></div>
+      <div class="pdf-modal-btns">
+        <button class="pdf-download" onclick="downloadPDF()">Descargar PDF</button>
+        <button class="pdf-close" onclick="closePDFModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
