@@ -1216,175 +1216,8 @@
         </div>
       </div>
 
-      <!-- SCREEN 5: DESGLOSE -->
-      <div class="screen" id="screen-5">
-        <h2>Cómo <em>calculamos</em> tu ahorro</h2>
-
-        <div class="accordion">
-          <div class="accordion-header active" onclick="toggleAccordion(this)">
-            <span>✓ Costos recurrentes mensuales</span>
-            <span class="accordion-header-icon">↓</span>
-          </div>
-          <div class="accordion-content visible">
-            <table class="breakdown-table">
-              <thead>
-                <tr>
-                  <th>Concepto</th>
-                  <th>ADOS</th>
-                  <th>Tu proveedor</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td id="breakdown-info-label">15 informes × 0.7 UF</td>
-                  <td id="breakdown-info-ados">10.5 UF</td>
-                  <td id="breakdown-info-prov">45.0 UF</td>
-                </tr>
-                <tr>
-                  <td id="breakdown-proc-label">20 procesos × 1.0 UF</td>
-                  <td id="breakdown-proc-ados">20.0 UF</td>
-                  <td id="breakdown-proc-prov">50.0 UF</td>
-                </tr>
-                <tr style="border-top: 2px solid var(--border-light); font-weight: 700;">
-                  <td>Subtotal recurrente</td>
-                  <td id="breakdown-monthly-ados">30.5 UF</td>
-                  <td id="breakdown-monthly-prov">95.0 UF</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="accordion">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>✓ Documentos adicionales por proceso</span>
-            <span class="accordion-header-icon">↓</span>
-          </div>
-          <div class="accordion-content">
-            <table class="breakdown-table">
-              <thead>
-                <tr>
-                  <th>Concepto</th>
-                  <th>ADOS</th>
-                  <th>Tu proveedor</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td id="breakdown-docs-label">0 docs × 0 UF</td>
-                  <td id="breakdown-docs-ados">0 UF</td>
-                  <td id="breakdown-docs-prov">0 UF</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="accordion">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>✓ Costos únicos (Año 1)</span>
-            <span class="accordion-header-icon">↓</span>
-          </div>
-          <div class="accordion-content">
-            <table class="breakdown-table">
-              <thead>
-                <tr>
-                  <th>Concepto</th>
-                  <th>ADOS</th>
-                  <th>Tu proveedor</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Implementación</td>
-                  <td>0 UF</td>
-                  <td id="breakdown-impl-prov">0 UF</td>
-                </tr>
-                <tr>
-                  <td>Configuración de documentos</td>
-                  <td>0 UF</td>
-                  <td id="breakdown-config-prov">0 UF</td>
-                </tr>
-                <tr style="border-top: 2px solid var(--border-light); font-weight: 700;">
-                  <td>Total costos únicos</td>
-                  <td>0 UF</td>
-                  <td id="breakdown-onetimes-prov">0 UF</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="accordion">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>✓ Total anual proyectado</span>
-            <span class="accordion-header-icon">↓</span>
-          </div>
-          <div class="accordion-content">
-            <table class="breakdown-table">
-              <thead>
-                <tr>
-                  <th>Período</th>
-                  <th>ADOS</th>
-                  <th>Tu proveedor</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Año 1 (incl. costos únicos)</strong></td>
-                  <td id="breakdown-y1-ados">366 UF</td>
-                  <td id="breakdown-y1-prov">452 UF</td>
-                </tr>
-                <tr>
-                  <td><strong>Año 2+ (sin costos únicos)</strong></td>
-                  <td id="breakdown-y2-ados">366 UF</td>
-                  <td id="breakdown-y2-prov">420 UF</td>
-                </tr>
-                <tr>
-                  <td><strong>Ahorro acumulado 3 años</strong></td>
-                  <td id="breakdown-3yr-ados">1.098 UF</td>
-                  <td>N/A</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="accordion">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>✓ Filosofía de cálculo</span>
-            <span class="accordion-header-icon">↓</span>
-          </div>
-          <div class="accordion-content">
-            <p style="font-size: 14px; color: var(--ados-text-secondary); line-height: 1.8; font-family: 'Space Grotesk', sans-serif;">
-              <strong>Año 1:</strong> Incluye 12 meses de costos recurrentes (base + documentos por proceso) + costos únicos (implementación + configuración).
-            </p>
-            <p style="font-size: 14px; color: var(--ados-text-secondary); line-height: 1.8; margin-top: 14px; font-family: 'Space Grotesk', sans-serif;">
-              <strong>Año 2 en adelante:</strong> Solo costos recurrentes (los únicos no se repiten).
-            </p>
-            <p style="font-size: 14px; color: var(--ados-text-secondary); line-height: 1.8; margin-top: 14px; font-family: 'Space Grotesk', sans-serif;">
-              <strong>ADOS</strong> tiene un modelo completamente recurrente: <strong>0.7 UF</strong> por informe y <strong>1.0 UF</strong> por proceso (que incluye contrato, personería, UAF, PEP, Anexos, Carta Poder, etc.) <em>sin costos adicionales.</em>
-            </p>
-          </div>
-        </div>
-
-        <div class="nav-buttons">
-          <button class="btn-nav" onclick="prevScreen()">← Atrás</button>
-          <button class="btn-nav primary" onclick="nextScreen()">Continuar →</button>
-
-      <button class="btn-secondary" onclick="contactForm()" style="margin-top: 12px;">📧 Contactarme</button>
-      <button class="btn-secondary" onclick="scheduleDemo()" style="margin-top: 12px;">📅 Agendar Reunión</button>
-      <button class="btn-secondary" onclick="saveCurrentQuote()" style="margin-top: 12px;">💾 Guardar Cotización</button>
-        </div>
-      </div>
-
       <!-- SCREEN 6: CTA -->
       <div class="screen" id="screen-6">
-
-      <div class="saved-quotes-panel">
-        <h3>💾 Mis Cotizaciones Guardadas</h3>
-        <div id="saved-quotes-container"></div>
-      </div>
 
         <div class="cta-final">
           <h3 class="cta-title">Tu operación <em>podría ahorrar</em></h3>
@@ -1392,9 +1225,9 @@
           <p class="cta-subtitle" id="cta-subtitle"><em>al año con ADOS</em> (19% de ahorro)</p>
 
           <div class="cta-buttons">
-            <button class="btn-primary" onclick="scheduleDemo()">Agendar una demo →</button>
-            <button class="btn-secondary" onclick="downloadSimulation()">Descargar simulación</button>
-            <button class="btn-secondary" onclick="shareSimulation()">Compartir</button>
+            <button class="btn-primary" onclick="scheduleDemo()">📅 Agendar Demo →</button>
+            <button class="btn-secondary" onclick="contactForm()">📧 Contactarme</button>
+            <button class="btn-secondary" onclick="saveCurrentQuote()">💾 Guardar Cotización</button>
           </div>
 
           <div class="cta-disclaimer">
@@ -1857,30 +1690,9 @@
     function nextScreen() { if (validateInputs() && currentScreen < 6) { currentScreen++; updateScreen(); } }
     function prevScreen() { if (currentScreen > 0) { currentScreen--; updateScreen(); } }
     function scheduleDemo() { 
-      window.open('https://calendly.com/pelayo@ados.solutions', '_blank'); 
+      window.open('https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ0ywkDjdnl7tMZnq2KKH_F0j2jLTO2MTEXUD6WDTV86LXQfn5oIdpr4QVus8fb1qANoBYa4-yfZ', '_blank'); 
     }
 
-
-    function shareSimulation() {
-      const savingsText = fmt(calcAnnualSavings()) + ' UF';
-      const savingsClp = fmtClp(calcAnnualSavings() * UF_VALUE);
-      const text = `🎉 He simulado mis costos legales con ADOS Simulador:\n\n📊 Volumen: ${state.volume.informes} informes + ${state.volume.procesos} procesos\n💰 Ahorro Año 1: ${savingsText} (${savingsClp})\n\n🔗 Simula el tuyo: https://simulador-ados.vercel.app`;
-      
-      if (navigator.share) {
-        navigator.share({ 
-          title: 'ADOS Simulador - Mi Cotización',
-          text: text,
-          url: 'https://simulador-ados.vercel.app'
-        }).catch(err => console.log('Share cancelled:', err));
-      } else {
-        // Fallback: copiar al clipboard
-        navigator.clipboard.writeText(text).then(() => {
-          alert('✅ Mensaje copiado al clipboard. Pégalo en WhatsApp, Email o tu red social favorita.');
-        }).catch(() => {
-          alert('📋 ' + text);
-        });
-      }
-    }
 
     initDarkMode();
         updateScreen();
