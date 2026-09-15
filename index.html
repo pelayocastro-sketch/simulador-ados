@@ -1418,6 +1418,69 @@
     }
 
 
+    function contactExecutive() {
+      const email = prompt('¿Cuál es tu email?', '');
+      if (!email) return;
+      
+      const phone = prompt('¿Cuál es tu teléfono? (opcional)', '');
+      
+      const message = `⚡ OPORTUNIDAD DE NEGOCIACIÓN\nQuiero hablar con un ejecutivo sobre mi cotización.\nMi proveedor actual cuesta: ${fmt(calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider())} UF/mes\nADOS cuesta: ${fmt(calcMonthlyRecurringADOS())} UF/mes\n\nEmail: ${email}${phone ? '\nTeléfono: ' + phone : ''}`;
+      
+      window.open('https://wa.me/56945696216?text=' + encodeURIComponent(message), '_blank');
+      
+      alert('✅ Tu información se ha compartido con nuestro ejecutivo. Te contactaremos pronto para mejorar la oferta.');
+    }
+
+    function updateCTABasedOnSavings() {
+      const savings = calcAnnualSavings();
+      const savingsPercent = calcSavingsPercent();
+      
+      const ctaFinal = document.querySelector('.cta-final');
+      const ctaButtons = document.querySelector('.cta-buttons');
+      
+      if (!ctaFinal || !ctaButtons) return;
+      
+      // Si ADOS es más caro (ahorro negativo o < 5%), mostrar opción de ejecutivo
+      if (savings < 0 || savingsPercent < 5) {
+        // Ocultar CTA normal
+        ctaButtons.style.display = 'none';
+        
+        // Crear panel ejecutivo
+        if (!document.getElementById('executive-panel')) {
+          const executivePanel = document.createElement('div');
+          executivePanel.id = 'executive-panel';
+          executivePanel.style.cssText = 'background: linear-gradient(135deg, #1C8D5B 0%, #0E1013 100%); padding: 24px; border-radius: 12px; text-align: center; color: white; margin-top: 24px;';
+          executivePanel.innerHTML = `
+            <p style="font-size: 14px; margin-bottom: 16px; line-height: 1.6;">
+              Tu proveedor actual es muy competitivo. <strong>Conectemos con nuestro equipo</strong> para explorar opciones personalizadas y mejores condiciones.
+            </p>
+            <button onclick="contactExecutive()" style="background: white; color: #33D98B; border: none; padding: 14px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%;">
+              🤝 Hablar con Ejecutivo
+            </button>
+          `;
+          ctaFinal.appendChild(executivePanel);
+        }
+      } else {
+        // Mostrar CTA normal
+        ctaButtons.style.display = 'flex';
+        const executivePanel = document.getElementById('executive-panel');
+        if (executivePanel) executivePanel.remove();
+      }
+    }
+
+    function contactExecutive() {
+      const email = prompt('¿Cuál es tu email?', '');
+      if (!email) return;
+      
+      const phone = prompt('¿Cuál es tu teléfono? (opcional)', '');
+      
+      const message = `⚡ OPORTUNIDAD DE NEGOCIACIÓN\nQuiero hablar con un ejecutivo sobre mi cotización.\nMi proveedor actual cuesta: ${fmt(calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider())} UF/mes\nADOS cuesta: ${fmt(calcMonthlyRecurringADOS())} UF/mes\n\nEmail: ${email}${phone ? '\nTeléfono: ' + phone : ''}`;
+      
+      window.open('https://wa.me/56945696216?text=' + encodeURIComponent(message), '_blank');
+      
+      alert('✅ Tu información se ha compartido con nuestro ejecutivo. Te contactaremos pronto para mejorar la oferta.');
+    }
+
     function contactForm() {
       const email = prompt('¿Cuál es tu email?', '');
       if (!email) return;
@@ -1766,6 +1829,11 @@
 
       document.getElementById('cta-savings').textContent = fmtClp(savings * UF_VALUE);
       document.getElementById('cta-subtitle').textContent = `al año con ADOS (${savingsPercent.toFixed(0)}% de ahorro)`;
+      
+      // Actualizar CTA basado en ahorros
+      if (currentScreen === 6) {
+        updateCTABasedOnSavings();
+      }
     }
 
     function fmt(n) {
