@@ -1321,6 +1321,18 @@
     const ADOS_PRICING = { informe: 0.7, proceso: 1.0 };
 
     let currentScreen = 0;
+
+    let darkMode = localStorage.getItem('ados-darkMode') === 'true';
+    let savedQuotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+    const MAX_SAVED_QUOTES = 5;
+    const VALIDATION_RULES = {
+      minVolume: 1,
+      maxVolumeWarning: 200,
+      minPrice: 0.1,
+      maxSavingsWarning: 60,
+      minSavingsWarning: 5
+    };
+
     let state = {
       volume: { informes: 15, procesos: 20 },
       provider: { 
@@ -1443,6 +1455,138 @@
       content.classList.toggle('visible');
     }
 
+    
+    function validateInputs() {
+      const errors = [];
+      const warnings = [];
+      
+      if (state.volume.informes < VALIDATION_RULES.minVolume) {
+        errors.push("Mínimo 1 informe sin contrato");
+      }
+      if (state.volume.procesos < VALIDATION_RULES.minVolume) {
+        errors.push("Mínimo 1 proceso con contrato");
+      }
+      if (state.provider.informe <= VALIDATION_RULES.minPrice) {
+        errors.push("El precio del informe debe ser mayor a " + VALIDATION_RULES.minPrice + " UF");
+      }
+      if (state.provider.proceso <= VALIDATION_RULES.minPrice) {
+        errors.push("El precio del proceso debe ser mayor a " + VALIDATION_RULES.minPrice + " UF");
+      }
+      
+      if (state.volume.informes > VALIDATION_RULES.maxVolumeWarning) {
+        warnings.push("⚠️ Volumen de informes inusual (" + state.volume.informes + "/mes). ¿Es correcto?");
+      }
+      if (state.volume.procesos > VALIDATION_RULES.maxVolumeWarning) {
+        warnings.push("⚠️ Volumen de procesos inusual (" + state.volume.procesos + "/mes). ¿Es correcto?");
+      }
+      
+      if (currentScreen >= 4) {
+        const savings = calcSavingsPercent();
+        if (savings > VALIDATION_RULES.maxSavingsWarning) {
+          warnings.push("💡 Ahorro > " + VALIDATION_RULES.maxSavingsWarning + "% es muy alto. Revisa tus números.");
+        }
+        if (savings < VALIDATION_RULES.minSavingsWarning && savings > 0) {
+          warnings.push("💡 El ahorro es pequeño. ¿Quieres revisar tus datos?");
+        }
+      }
+      
+      return { errors, warnings };
+    }
+    
+    function showValidationMessages() {
+      const { errors, warnings } = validateInputs();
+      const errorEl = document.getElementById('validation-errors');
+      const warningEl = document.getElementById('validation-warnings');
+      
+      if (errorEl) {
+        if (errors.length > 0) {
+          errorEl.innerHTML = errors.map(e => '<div class="validation-error">❌ ' + e + '</div>').join('');
+          errorEl.style.display = 'block';
+        } else {
+          errorEl.style.display = 'none';
+        }
+      }
+      
+      if (warningEl) {
+        if (warnings.length > 0) {
+          warningEl.innerHTML = warnings.map(w => '<div class="validation-warning">' + w + '</div>').join('');
+          warningEl.style.display = 'block';
+        } else {
+          warningEl.style.display = 'none';
+        }
+      }
+    }
+
+    
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      localStorage.setItem('ados-darkMode', darkMode);
+      document.body.classList.toggle('dark-mode');
+      updateScreen();
+    }
+    
+    function initDarkMode() {
+      if (darkMode) {
+        document.body.classList.add('dark-mode');
+      }
+    }
+
+    
+    function saveQuote(name = null) {
+      const quoteName = name || "Cotización " + new Date().toLocaleDateString('es-CL');
+      const quote = {
+        id: Date.now(),
+        name: quoteName,
+        timestamp: new Date().toISOString(),
+        state: JSON.parse(JSON.stringify(state))
+      };
+      
+      savedQuotes.unshift(quote);
+      if (savedQuotes.length > MAX_SAVED_QUOTES) {
+        savedQuotes.pop();
+      }
+      localStorage.setItem('ados-quotes', JSON.stringify(savedQuotes));
+      alert('✅ Cotización guardada: ' + quoteName);
+      updateSavedQuotesList();
+    }
+    
+    function loadQuote(id) {
+      const quote = savedQuotes.find(q => q.id === id);
+      if (quote) {
+        state = JSON.parse(JSON.stringify(quote.state));
+        currentScreen = 0;
+        updateCalcs();
+        updateScreen();
+        alert('✅ Cotización cargada: ' + quote.name);
+      }
+    }
+    
+    function deleteQuote(id) {
+      savedQuotes = savedQuotes.filter(q => q.id !== id);
+      localStorage.setItem('ados-quotes', JSON.stringify(savedQuotes));
+      updateSavedQuotesList();
+    }
+    
+    function updateSavedQuotesList() {
+      const list = document.getElementById('saved-quotes-list');
+      if (list) {
+        if (savedQuotes.length === 0) {
+          list.innerHTML = '<p style="color: #9BA1A6; font-size: 12px;">No hay cotizaciones guardadas</p>';
+        } else {
+          list.innerHTML = savedQuotes.map(q => `
+            <div class="saved-quote-item">
+              <div class="quote-name">${q.name}</div>
+              <div class="quote-date">${new Date(q.timestamp).toLocaleDateString('es-CL')} ${new Date(q.timestamp).toLocaleTimeString('es-CL')}</div>
+              <div class="quote-actions">
+                <button onclick="loadQuote(${q.id})" class="btn-small">Cargar</button>
+                <button onclick="deleteQuote(${q.id})" class="btn-small btn-danger">Borrar</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
     function updateCalcs() {
       state.provider.informe = parseFloat(document.getElementById('prov-informe').value) || 0;
       state.provider.proceso = parseFloat(document.getElementById('prov-proceso').value) || 0;
@@ -1527,6 +1671,181 @@
     function nextScreen() { if (currentScreen < 6) { currentScreen++; updateScreen(); } }
     function prevScreen() { if (currentScreen > 0) { currentScreen--; updateScreen(); } }
     function scheduleDemo() { window.open('https://ados.solutions', '_blank'); }
+
+    
+    function previewPDF() {
+      const pdfContent = `
+        <style>
+          body { font-family: 'Space Grotesk', sans-serif; color: #0E1013; margin: 0; padding: 40px; background: white; }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #E5E7EB; padding-bottom: 20px; }
+          .logo { display: flex; align-items: center; gap: 12px; }
+          .logo-symbol { width: 24px; height: 24px; background: #33D98B; transform: rotate(45deg); border-radius: 3px; }
+          .logo-text { font-size: 18px; font-weight: 700; letter-spacing: 2px; }
+          .header-right { text-align: right; font-size: 12px; color: #9BA1A6; }
+          .header-label { text-transform: uppercase; letter-spacing: 1px; font-size: 11px; color: #33D98B; margin-bottom: 4px; }
+          .header-date { font-size: 13px; color: #0E1013; }
+          h1 { font-size: 42px; font-weight: 700; margin: 30px 0; line-height: 1.2; }
+          .volume-box { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 24px; margin-bottom: 30px; display: flex; justify-content: space-around; }
+          .volume-item { text-align: center; }
+          .volume-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #9BA1A6; margin-bottom: 8px; }
+          .volume-value { font-size: 24px; font-weight: 700; color: #0E1013; }
+          .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+          .comparison-card { border: 1px solid #E5E7EB; border-radius: 12px; padding: 24px; }
+          .comparison-card.ados { border: 2px solid #33D98B; background: rgba(51, 217, 139, 0.02); }
+          .card-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #9BA1A6; margin-bottom: 16px; border-bottom: 1px solid #E5E7EB; padding-bottom: 12px; }
+          .card-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+          .card-label { color: #9BA1A6; }
+          .card-value { font-weight: 700; color: #0E1013; }
+          .card-value.green { color: #33D98B; }
+          .card-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid #E5E7EB; }
+          .card-section-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; color: #0E1013; }
+          .card-note { font-size: 12px; color: #9BA1A6; line-height: 1.5; }
+          .result-box { background: #0E1013; color: white; border-radius: 12px; padding: 36px; margin-bottom: 30px; }
+          .result-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #33D98B; margin-bottom: 24px; }
+          .result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; }
+          .result-item { text-align: center; }
+          .result-label { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+          .result-value { font-size: 32px; font-weight: 700; color: white; margin-bottom: 4px; }
+          .result-value.highlight { color: #33D98B; font-size: 48px; }
+          .result-percent { font-size: 24px; color: #33D98B; font-weight: 700; }
+          .footer-note { font-size: 12px; color: #9BA1A6; margin: 24px 0; }
+          .footer-note a { color: #33D98B; text-decoration: none; }
+          .page-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #E5E7EB; font-size: 11px; color: #9BA1A6; }
+          .footer-logo { display: flex; align-items: center; gap: 8px; }
+          .footer-logo-symbol { width: 16px; height: 16px; background: #33D98B; transform: rotate(45deg); border-radius: 2px; }
+        </style>
+        <div class="header">
+          <div class="logo">
+            <div class="logo-symbol"></div>
+            <span class="logo-text">ADOS</span>
+          </div>
+          <div class="header-right">
+            <div class="header-label">Simulación de costos</div>
+            <div class="header-date">Fecha: ${new Date().toLocaleDateString('es-CL')}</div>
+          </div>
+        </div>
+
+        <h1>ADOS Simulador — Simulación de costos</h1>
+
+        <div class="volume-box">
+          <div class="volume-item">
+            <div class="volume-label">Informes sin contrato</div>
+            <div class="volume-value">${state.volume.informes}/mes</div>
+          </div>
+          <div class="volume-item">
+            <div class="volume-label">Procesos con contrato</div>
+            <div class="volume-value">${state.volume.procesos}/mes</div>
+          </div>
+        </div>
+
+        <div class="comparison">
+          <div class="comparison-card">
+            <div class="card-title">Tu proveedor actual</div>
+            <div class="card-section">
+              <div class="card-section-title">Costos base</div>
+              <div class="card-row">
+                <span class="card-label">Informe</span>
+                <span class="card-value">${fmt(state.provider.informe)} UF</span>
+              </div>
+              <div class="card-row">
+                <span class="card-label">Proceso</span>
+                <span class="card-value">${fmt(state.provider.proceso)} UF</span>
+              </div>
+            </div>
+            <div class="card-section">
+              <div class="card-section-title">Costos únicos</div>
+              <div class="card-row">
+                <span class="card-label">Implementación</span>
+                <span class="card-value">${state.provider.hasImpl ? fmt(state.provider.impl) + ' UF' : 'No'}</span>
+              </div>
+              <div class="card-row">
+                <span class="card-label">Configuración documento</span>
+                <span class="card-value">${state.provider.hasDocConfig ? fmt(state.provider.docConfigCost) + ' UF' : 'No'}</span>
+              </div>
+            </div>
+            <div class="card-section">
+              <div class="card-section-title">Costos por proceso</div>
+              <div class="card-row">
+                <span class="card-label">Documentos adicionales</span>
+                <span class="card-value">${state.provider.hasDocUsage ? fmt(state.provider.docUsageCost) + ' UF × ' + fmt(state.provider.docQty) + ' docs' : 'No'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="comparison-card ados">
+            <div class="card-title">ADOS — Modelo de precios</div>
+            <div class="card-row">
+              <span class="card-label">Informe</span>
+              <span class="card-value green">${fmt(ADOS_PRICING.informe)} UF</span>
+            </div>
+            <div class="card-row">
+              <span class="card-label">Proceso</span>
+              <span class="card-value green">${fmt(ADOS_PRICING.proceso)} UF</span>
+            </div>
+            <div class="card-note" style="margin-top: 12px;">Incluye contrato, personería, UAF, PEP, Anexos, Carta Poder, etc.</div>
+            <div class="card-section">
+              <div class="card-row">
+                <span class="card-label">Implementación</span>
+                <span class="card-value">No</span>
+              </div>
+              <div class="card-row">
+                <span class="card-label">Documentos adicionales</span>
+                <span class="card-value">No (incluidos)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-box">
+          <div class="result-title">Resultado de la simulación</div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">Costo mensual (Proveedor)</div>
+              <div class="result-value">${fmt(calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider())} UF</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Costo mensual (ADOS)</div>
+              <div class="result-value" style="color: #33D98B;">${fmt(calcMonthlyRecurringADOS())} UF</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Ahorro Año 1</div>
+              <div class="result-value highlight">${fmt(calcAnnualSavings())} UF</div>
+              <div class="result-percent">${calcSavingsPercent().toFixed(1)}%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          Nota: Simulación referencial. Agendar demo en <a href="https://ados.solutions">ados.solutions</a> para validar.
+        </div>
+
+        <div class="page-footer">
+          <div class="footer-logo">
+            <div class="footer-logo-symbol"></div>
+            <span>ADOS Simulador · Simulación de costos</span>
+          </div>
+          <div>${new Date().toLocaleDateString('es-CL')}</div>
+        </div>
+      ` ;
+      
+      const modal = document.createElement('div');
+      modal.className = 'pdf-preview-modal';
+      modal.innerHTML = `
+        <div class="pdf-preview-content">
+          <button class="pdf-preview-close" onclick="this.closest('.pdf-preview-modal').remove()">✕</button>
+          <div class="pdf-preview-header">
+            <h3>Vista Previa de la Cotización</h3>
+          </div>
+          <div class="pdf-preview-body" id="pdf-preview-body"></div>
+          <div class="pdf-preview-footer">
+            <button class="btn-primary" onclick="downloadSimulation(); this.closest('.pdf-preview-modal').remove();">Descargar PDF</button>
+            <button class="btn-secondary" onclick="shareSimulation(); this.closest('.pdf-preview-modal').remove();">Compartir</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      document.getElementById('pdf-preview-body').innerHTML = pdfContent;
+    }
 
     function downloadSimulation() {
       const data = `ADOS Simulador - Simulación de costos
