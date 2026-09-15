@@ -874,6 +874,9 @@
 </head>
 <body>
   <div class="container">
+      <div id="validation-errors" class="validation-errors" style="display:none;"></div>
+      <div id="validation-warnings" class="validation-warnings" style="display:none;"></div>
+      <div id="saved-quotes-list"></div>
     <!-- HEADER -->
     <div class="header">
       <div class="header-left">
@@ -1299,7 +1302,8 @@
 
           <div class="cta-buttons">
             <button class="btn-primary" onclick="scheduleDemo()">Agendar una demo →</button>
-            <button class="btn-secondary" onclick="downloadSimulation()">Descargar simulación</button>
+            <button class="btn-secondary" onclick="previewPDF()">Vista Previa →</button>
+          <button class="btn-secondary" onclick="downloadSimulation()">Descargar simulación</button>
             <button class="btn-secondary" onclick="shareSimulation()">Compartir</button>
           </div>
 
@@ -2216,7 +2220,15 @@ Nota: Simulación referencial. Agendar demo en ados.solutions para validar.`;
     updateScreen();
   </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+    // Inicializar dark mode al cargar
+    window.addEventListener('DOMContentLoaded', function() {
+      initDarkMode();
+      updateSavedQuotesList();
+      updateScreen();
+    });
+
+  </script>
 
 </body>
 </html>
