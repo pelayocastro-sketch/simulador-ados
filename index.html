@@ -30,6 +30,16 @@
     .dark-mode-toggle { position: fixed; top: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #33D98B; border: none; color: white; font-size: 24px; cursor: pointer; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
     .dark-mode-toggle:hover { opacity: 0.9; }
     body.dark-mode .dark-mode-toggle { background: #FFD700; }
+
+    .saved-quotes { background: #1A1E24; padding: 20px; border-radius: 8px; margin-top: 20px; }
+    .saved-quote-item { background: #0E1013; padding: 12px; margin: 8px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+    .quote-info { text-align: left; }
+    .quote-name { font-weight: 600; margin-bottom: 4px; }
+    .quote-date { font-size: 12px; color: #999; }
+    .quote-btns { display: flex; gap: 8px; }
+    .quote-btn { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; }
+    .quote-load { background: #33D98B; color: white; }
+    .quote-delete { background: #ff4444; color: white; }
 </style>
 </head>
 <body>
@@ -112,7 +122,14 @@
     <div style="margin-top: 50px;">
       <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
       <button class="btn btn-secondary" onclick="gotoStart()">Nueva simulación</button>
+    
+    
+    <div class="saved-quotes">
+      <p style="font-size: 12px; color: #33D98B; text-transform: uppercase; margin-bottom: 16px;">📋 Mis cotizaciones guardadas</p>
+      <div id="saved-quotes-list"></div>
+      <button class="btn btn-secondary" style="margin-top: 12px; width: 100%;" onclick="saveCurrentQuote()">💾 Guardar esta cotización</button>
     </div>
+</div>
   </div>
 </div>
 
@@ -120,6 +137,80 @@
   let currentScreen = 0;
   const UF_VALUE = 40867.18;
 
+
+
+  function saveCurrentQuote() {
+    const name = prompt('Nombre de la cotización:', 'Cotización ' + new Date().toLocaleDateString('es-CL'));
+    if (!name) return;
+
+    const quote = {
+      id: Date.now(),
+      name: name,
+      date: new Date().toLocaleString('es-CL'),
+      data: {
+        informes: window.informes,
+        procesos: window.procesos,
+        priceInf: parseFloat(document.getElementById('price-inf').value),
+        priceProc: parseFloat(document.getElementById('price-proc').value)
+      }
+    };
+
+    let quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+    quotes.unshift(quote);
+    if (quotes.length > 5) quotes.pop();
+    localStorage.setItem('ados-quotes', JSON.stringify(quotes));
+
+    updateSavedQuotesList();
+    alert('✅ Cotización guardada: ' + name);
+  }
+
+  function updateSavedQuotesList() {
+    const quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+    const listDiv = document.getElementById('saved-quotes-list');
+    
+    if (quotes.length === 0) {
+      listDiv.innerHTML = '<p style="color: #999; font-size: 14px;">No hay cotizaciones guardadas</p>';
+      return;
+    }
+
+    listDiv.innerHTML = quotes.map(q => `
+      <div class="saved-quote-item">
+        <div class="quote-info">
+          <div class="quote-name">${q.name}</div>
+          <div class="quote-date">${q.date}</div>
+        </div>
+        <div class="quote-btns">
+          <button class="quote-btn quote-load" onclick="loadQuote(${q.id})">Cargar</button>
+          <button class="quote-btn quote-delete" onclick="deleteQuote(${q.id})">Eliminar</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function loadQuote(id) {
+    const quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+    const quote = quotes.find(q => q.id === id);
+    if (!quote) return;
+
+    window.informes = quote.data.informes;
+    window.procesos = quote.data.procesos;
+    document.getElementById('informes').value = quote.data.informes;
+    document.getElementById('procesos').value = quote.data.procesos;
+    document.getElementById('price-inf').value = quote.data.priceInf;
+    document.getElementById('price-proc').value = quote.data.priceProc;
+
+    currentScreen = 0;
+    updateScreen();
+    alert('✅ Cotización cargada: ' + quote.name);
+  }
+
+  function deleteQuote(id) {
+    if (!confirm('¿Eliminar esta cotización?')) return;
+    let quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+    quotes = quotes.filter(q => q.id !== id);
+    localStorage.setItem('ados-quotes', JSON.stringify(quotes));
+    updateSavedQuotesList();
+  }
 
   function validateInputs() {
     const info = parseInt(document.getElementById('informes').value) || 0;
@@ -245,6 +336,7 @@
 
   window.addEventListener('DOMContentLoaded', function() {
     initDarkMode();
+    updateSavedQuotesList();
     updateScreen();
   });
 
