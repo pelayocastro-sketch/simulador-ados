@@ -1648,56 +1648,123 @@
       const savingsPercent = calcSavingsPercent();
       
       const html = `
-        <div style="font-family: 'Arial', sans-serif; padding: 20px; background: white;">
-          <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #33D98B; padding-bottom: 20px;">
-            <div style="font-size: 20px; font-weight: bold; color: #33D98B; margin-bottom: 10px;">ADOS SIMULADOR</div>
-            <div style="font-size: 14px; color: #666;">Cotización de Ahorro</div>
-          </div>
-          
-          <p style="margin-bottom: 20px;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CL')} | <strong>Hora:</strong> ${new Date().toLocaleTimeString('es-CL')}</p>
-          
-          <div style="margin: 20px 0;">
-            <h3 style="font-size: 13px; font-weight: bold; color: #0E1013; margin-bottom: 10px;">📊 VOLUMEN DE OPERACIONES</h3>
-            <p style="margin: 5px 0; font-size: 12px;">• Informes sin contrato: <strong>${state.volume.informes}/mes</strong></p>
-            <p style="margin: 5px 0; font-size: 12px;">• Procesos con contrato: <strong>${state.volume.procesos}/mes</strong></p>
+        <div style="font-family: 'Arial', sans-serif; padding: 0; background: white; line-height: 1.4;">
+          <!-- HEADER -->
+          <div style="text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #33D98B;">
+            <div style="font-size: 16px; font-weight: bold; letter-spacing: 2px; color: #0E1013;">A D O S</div>
+            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #0E1013; margin-top: 4px;">S I M U L A C I Ó N D E C O S T O S</div>
+            <div style="font-size: 11px; color: #666; margin-top: 8px;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CL')}</div>
           </div>
 
-          <div style="margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 6px; border-left: 3px solid #ddd;">
-            <h3 style="font-size: 13px; font-weight: bold; color: #0E1013; margin-bottom: 10px;">💰 TU PROVEEDOR ACTUAL</h3>
-            <table style="width: 100%; font-size: 12px;">
-              <tr><td>Costo Mensual:</td><td style="text-align: right;"><strong>${fmt(provMonthly)} UF</strong></td></tr>
-              <tr><td>Costo Anual (Año 1):</td><td style="text-align: right;"><strong>${fmt(provYear1)} UF</strong></td></tr>
+          <!-- TÍTULO INTERNO -->
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 13px; font-weight: bold; color: #0E1013;">ADOS Simulador —</div>
+            <div style="font-size: 12px; color: #666;">Simulación de costos</div>
+          </div>
+
+          <!-- VOLUMEN -->
+          <div style="margin: 20px 0; padding: 12px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #0E1013; margin-bottom: 8px;">V O L U M E N   D E   O P E R A C I O N E S</div>
+            <table style="width: 100%; font-size: 11px;">
+              <tr>
+                <td><strong>Informes sin contrato</strong></td>
+                <td style="text-align: right;"><strong>${state.volume.informes}/mes</strong></td>
+              </tr>
+              <tr style="height: 6px;"><td colspan="2"></td></tr>
+              <tr>
+                <td><strong>Procesos con contrato</strong></td>
+                <td style="text-align: right;"><strong>${state.volume.procesos}/mes</strong></td>
+              </tr>
             </table>
           </div>
 
-          <div style="margin: 20px 0; background: #e8f9f2; padding: 15px; border-radius: 6px; border-left: 3px solid #33D98B;">
-            <h3 style="font-size: 13px; font-weight: bold; color: #33D98B; margin-bottom: 10px;">✨ ADOS — Modelo de Precios</h3>
-            <table style="width: 100%; font-size: 12px;">
-              <tr><td>Costo Mensual:</td><td style="text-align: right;"><strong>${fmt(adosMonthly)} UF</strong></td></tr>
-              <tr><td>Costo Anual (Año 1):</td><td style="text-align: right;"><strong>${fmt(adosYear1)} UF</strong></td></tr>
+          <!-- PROVEEDOR -->
+          <div style="margin: 20px 0; padding: 12px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #0E1013; margin-bottom: 8px;">T U   P R O V E E D O R   A C T U A L</div>
+            
+            <div style="margin-bottom: 10px;">
+              <div style="font-size: 11px; color: #666; margin-bottom: 6px;"><strong>Costos base</strong></div>
+              <table style="width: 100%; font-size: 11px; margin-left: 12px;">
+                <tr>
+                  <td>Informe</td>
+                  <td style="text-align: right;"><strong>${fmt(state.provider.informe)} UF</strong></td>
+                </tr>
+                <tr>
+                  <td>Proceso</td>
+                  <td style="text-align: right;"><strong>${fmt(state.provider.proceso)} UF</strong></td>
+                </tr>
+              </table>
+            </div>
+
+            ${state.provider.hasImpl || state.provider.hasDocConfig ? `
+            <div style="margin-bottom: 10px;">
+              <div style="font-size: 11px; color: #666; margin-bottom: 6px;"><strong>Costos únicos</strong></div>
+              <table style="width: 100%; font-size: 11px; margin-left: 12px;">
+                ${state.provider.hasImpl ? `<tr><td>Implementación</td><td style="text-align: right;"><strong>${fmt(state.provider.impl)} UF</strong></td></tr>` : '<tr><td>Implementación</td><td style="text-align: right;">No</td></tr>'}
+                ${state.provider.hasDocConfig ? `<tr><td>Configuración documento</td><td style="text-align: right;"><strong>${fmt(state.provider.docConfigCost)} UF</strong></td></tr>` : '<tr><td>Configuración documento</td><td style="text-align: right;">No</td></tr>'}
+              </table>
+            </div>
+            ` : ''}
+
+            ${state.provider.hasDocUsage ? `
+            <div>
+              <div style="font-size: 11px; color: #666; margin-bottom: 6px;"><strong>Costos por proceso</strong></div>
+              <table style="width: 100%; font-size: 11px; margin-left: 12px;">
+                <tr>
+                  <td>Documentos adicionales</td>
+                  <td style="text-align: right;"><strong>${fmt(state.provider.docUsageCost)} UF × ${fmt(state.provider.docQty)} docs</strong></td>
+                </tr>
+              </table>
+            </div>
+            ` : ''}
+          </div>
+
+          <!-- ADOS PRICING -->
+          <div style="margin: 20px 0; padding: 12px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #33D98B; margin-bottom: 8px;">A D O S   —   M O D E L O   D E   P R E C I O S</div>
+            <table style="width: 100%; font-size: 11px;">
+              <tr>
+                <td>Informe</td>
+                <td style="text-align: right;"><strong>0,7 UF</strong></td>
+              </tr>
+              <tr>
+                <td>Proceso</td>
+                <td style="text-align: right;"><strong>1,0 UF</strong></td>
+              </tr>
             </table>
+            <div style="font-size: 10px; color: #666; margin-top: 8px;">Incluye contrato, personería, UAF, PEP, Anexos, Carta Poder, etc.</div>
+            <div style="font-size: 10px; color: #666; margin-top: 4px;">Implementación No</div>
+            <div style="font-size: 10px; color: #666;">Documentos adicionales No (incluidos)</div>
           </div>
 
-          <div style="margin: 20px 0; background: #fff9e6; padding: 15px; border-radius: 6px; border: 2px solid #FFD700;">
-            <h3 style="font-size: 14px; font-weight: bold; color: #0E1013; margin-bottom: 10px;">🎯 TU AHORRO AÑO 1</h3>
-            <div style="font-size: 20px; color: #33D98B; font-weight: bold; text-align: center;">
-              ${fmt(savings)} UF
-            </div>
-            <div style="font-size: 16px; font-weight: bold; text-align: center; color: #33D98B; margin-top: 8px;">
-              ${savingsPercent.toFixed(1)}% de ahorro
-            </div>
-            <div style="font-size: 12px; color: #666; text-align: center; margin-top: 10px;">
-              ≈ ${fmtClp(savings * UF_VALUE)} pesos chilenos
+          <!-- RESULTADO -->
+          <div style="margin: 20px 0; padding: 15px 0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; background: #f9f9f9; padding: 15px;">
+            <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px; color: #0E1013; margin-bottom: 12px;">R E S U L T A D O   D E   L A   S I M U L A C I Ó N</div>
+            
+            <table style="width: 100%; font-size: 12px;">
+              <tr>
+                <td><strong>Costo mensual (Proveedor)</strong></td>
+                <td style="text-align: right;"><strong>${fmt(provMonthly)} UF</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Costo mensual (ADOS)</strong></td>
+                <td style="text-align: right;"><strong>${fmt(adosMonthly)} UF</strong></td>
+              </tr>
+            </table>
+
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd;">
+              <div style="font-size: 11px; color: #666; text-align: center; margin-bottom: 6px;">AHORRO AÑO 1</div>
+              <div style="font-size: 20px; font-weight: bold; color: #33D98B; text-align: center; margin-bottom: 4px;">${fmt(savings)}</div>
+              <div style="font-size: 14px; font-weight: bold; color: #33D98B; text-align: center; margin-bottom: 8px;">UF</div>
+              <div style="font-size: 14px; font-weight: bold; color: #33D98B; text-align: center;">${savingsPercent.toFixed(1)}%</div>
+              <div style="font-size: 11px; color: #999; text-align: center; margin-top: 8px;">≈ ${fmtClp(savings * UF_VALUE)}</div>
             </div>
           </div>
 
-          <div style="margin: 30px 0; padding-top: 20px; border-top: 1px solid #ddd;">
-            <p style="font-size: 11px; color: #999; text-align: center;">
-              Simulación referencial. Agendar demo en ados.solutions para validar datos y estructura de precios.
-            </p>
-            <p style="font-size: 11px; color: #999; text-align: center; margin-top: 10px;">
-              Generated by ADOS Simulador • ${new Date().toISOString().split('T')[0]}
-            </p>
+          <!-- FOOTER -->
+          <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #ddd; text-align: center;">
+            <div style="font-size: 10px; color: #999;">Nota: Simulación referencial. Agendar demo en ados.solutions para validar.</div>
+            <div style="font-size: 10px; color: #999; margin-top: 8px;">ADOS Simulador · Simulación de costos ${new Date().toLocaleDateString('es-CL')}</div>
           </div>
         </div>
       `;
