@@ -161,6 +161,10 @@
       <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
       <button class="btn btn-secondary" onclick="gotoStart()">Nueva simulación
     <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="previewPDF()">📄 Vista Previa PDF</button>
+    
+    <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="sharePDF()">📤 Compartir PDF</button>
+    <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="scheduleDemo()">📅 Agendar Demo</button>
+
 
     <div class="mode-selector">
       <button class="mode-btn active" id="btn-completo" onclick="setMode('completo')">📋 Modo Completo</button>
@@ -444,6 +448,50 @@
   function initMode() {
     mode = localStorage.getItem('ados-mode') || 'completo';
     setMode(mode);
+  }
+
+
+  function sharePDF() {
+    const text = `🎉 Hola! Simulé mis costos legales en ADOS Simulador:
+📊 Volumen: ${window.informes} informes + ${window.procesos} procesos
+💰 Ahorro potencial: Agendar demo para saber
+🔗 https://simulador-ados.vercel.app
+    `;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'ADOS Simulador',
+        text: text
+      }).catch(err => console.log('Error sharing:', err));
+    } else {
+      // Fallback: copiar al clipboard
+      navigator.clipboard.writeText(text);
+      alert('✅ Texto copiado al clipboard. Pégalo en tu chat o email.');
+    }
+  }
+
+  function scheduleDemo() {
+    const info = window.informes || 0;
+    const proc = window.procesos || 0;
+    const priceInf = parseFloat(document.getElementById('price-inf').value) || 0;
+    const priceProc = parseFloat(document.getElementById('price-proc').value) || 0;
+    const costProvMes = (info * priceInf) + (proc * priceProc);
+    
+    const title = 'Demo ADOS Simulador - Validar Cotización';
+    const description = `Volumen: ${info} informes + ${proc} procesos\nCosto mensual proveedor: ${costProvMes.toFixed(2)} UF`;
+    const duration = 60; // minutos
+    
+    // Google Calendar link
+    const start = new Date();
+    start.setHours(start.getHours() + 24); // Mañana
+    const end = new Date(start.getTime() + duration * 60000);
+    
+    const startStr = start.toISOString().replace(/[-:]/g, '').split('.')[0];
+    const endStr = end.toISOString().replace(/[-:]/g, '').split('.')[0];
+    
+    const calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(title) + '&details=' + encodeURIComponent(description) + '&dates=' + startStr + 'Z/' + endStr + 'Z&location=Online&pli=1&uid=ados' + Date.now();
+    
+    window.open(calendarUrl, '_blank');
   }
 
   function validateInputs() {
