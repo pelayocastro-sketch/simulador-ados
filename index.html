@@ -1,639 +1,1985 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ADOS Simulador - Test</title>
+  <title>ADOS Simulador</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='20' y='20' width='60' height='60' rx='8' fill='%2322C579'/%3E%3Crect x='35' y='35' width='30' height='30' rx='4' fill='white'/%3E%3C/svg%3E">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0E1013; color: #fff; padding: 40px 20px; }
-    .container { max-width: 800px; margin: 0 auto; }
-    .screen { display: none; text-align: center; padding: 60px 40px; }
-    .screen.active { display: block; }
-    h1 { font-size: 48px; margin-bottom: 20px; }
-    p { font-size: 16px; color: #ccc; margin-bottom: 30px; line-height: 1.6; }
-    .btn { padding: 14px 32px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; margin: 10px; font-weight: 600; }
-    .btn-primary { background: #fff; color: #0E1013; }
-    .btn-secondary { background: #33D98B; color: #0E1013; }
-    .btn:hover { opacity: 0.9; }
-    input { padding: 10px; font-size: 16px; width: 100%; max-width: 300px; margin: 10px 0; border: 1px solid #33D98B; border-radius: 8px; background: #1A1E24; color: #fff; }
-    .result { background: #1A1E24; padding: 30px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #33D98B; text-align: left; }
-  
-    .error-msg { background: #ff4444; color: white; padding: 12px; border-radius: 6px; margin: 10px 0; font-size: 14px; display: none; }
-    .warning-msg { background: #ff9800; color: white; padding: 12px; border-radius: 6px; margin: 10px 0; font-size: 14px; display: none; }
-    .error-msg.show, .warning-msg.show { display: block; }
-    input.error { border-color: #ff4444 !important; }
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-    /* Dark Mode */
-    body.dark-mode { background: #0a0d0f; }
-    body.dark-mode { --bg-light: #1a1e24; --text-light: #e0e0e0; }
-    .dark-mode-toggle { position: fixed; top: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #33D98B; border: none; color: white; font-size: 24px; cursor: pointer; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-    .dark-mode-toggle:hover { opacity: 0.9; }
+    :root {
+      /* ADOS OFFICIAL COLORS - Manual de Marca v1.0 */
+      --ados-tinta: #0E1013;
+      --ados-verde: #33D98B;
+      --ados-verde-deep: #1C8D5B;
+      --ados-hueso: #F2F4F1;
+      --ados-text-secondary: #9BA1A6;
+      --ados-border: #1E2227;
+      --ados-favicon-green: #22C579;
+      
+      /* Light mode */
+      --bg-white: #FFFFFF;
+      --bg-light: #F9FAFB;
+      --border-light: #E5E7EB;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-white);
+      color: var(--ados-tinta);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 80px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--ados-tinta);
+    }
+
+    .logo-symbol {
+      width: 24px;
+      height: 24px;
+      background: var(--ados-verde);
+      transform: rotate(45deg);
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .logo-badge {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ados-text-secondary);
+      padding-left: 24px;
+      border-left: 1px solid var(--border-light);
+    }
+
+    .header-link {
+      font-size: 13px;
+      color: var(--ados-text-secondary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .header-link:hover {
+      color: var(--ados-tinta);
+    }
+
+    /* PROGRESS */
+    .progress-container {
+      margin-bottom: 60px;
+    }
+
+    .progress-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .progress-step {
+      height: 3px;
+      flex: 1;
+      background: var(--border-light);
+      border-radius: 1.5px;
+      transition: background 0.3s ease;
+    }
+
+    .progress-step.active {
+      background: var(--ados-tinta);
+    }
+
+    .progress-step.completed {
+      background: var(--ados-verde);
+    }
+
+    .progress-label {
+      font-size: 11px;
+      color: var(--ados-text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* SCREENS */
+    .screen {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* INTRO */
+    .screen-intro {
+      text-align: center;
+      padding: 120px 60px;
+      background: var(--ados-tinta);
+      border-radius: 16px;
+      color: var(--ados-hueso);
+    }
+
+    .intro-logo {
+      margin-bottom: 40px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .intro-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ados-verde);
+      margin-bottom: 40px;
+      display: inline-block;
+    }
+
+    h1 {
+      font-size: 54px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+    }
+
+    .intro-subtitle {
+      font-size: 16px;
+      color: rgba(242,244,241,0.9);
+      margin-bottom: 12px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+
+    .intro-hint {
+      font-size: 13px;
+      color: rgba(242,244,241,0.7);
+      margin-bottom: 50px;
+    }
+
+    em, .italic {
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    strong {
+      font-weight: 600;
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      background: var(--ados-hueso);
+      color: var(--ados-tinta);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      letter-spacing: 0.3px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .btn-primary:hover {
+      background: var(--ados-verde);
+      color: var(--ados-tinta);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--ados-tinta);
+      border: 1px solid var(--border-light);
+      padding: 13px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.3px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--ados-tinta);
+      background: var(--bg-light);
+    }
+
+    /* SCREEN CONTENT */
+    h2 {
+      font-size: 46px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .screen-subtitle {
+      font-size: 16px;
+      color: var(--ados-text-secondary);
+      margin-bottom: 50px;
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    /* VOLUME CARDS */
+    .volume-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .volume-card {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 36px 28px;
+      text-align: center;
+    }
+
+    .volume-card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--ados-text-secondary);
+      margin-bottom: 28px;
+    }
+
+    .volume-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .volume-btn {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      color: var(--ados-tinta);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .volume-btn:hover {
+      border-color: var(--ados-verde);
+      background: var(--bg-light);
+    }
+
+    .volume-value {
+      font-size: 44px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--ados-verde);
+      min-width: 110px;
+    }
+
+    .volume-hint {
+      font-size: 12px;
+      color: var(--ados-text-secondary);
+    }
+
+    /* INPUT FIELDS */
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .input-field {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 28px;
+    }
+
+    .input-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--ados-text-secondary);
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--ados-tinta);
+      transition: all 0.3s ease;
+      background: white;
+      font-weight: 600;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--ados-verde);
+      background: rgba(51, 217, 139, 0.05);
+    }
+
+    .input-hint {
+      font-size: 11px;
+      color: var(--ados-text-secondary);
+      margin-top: 10px;
+    }
+
+    /* TOGGLE SECTION */
+    .toggle-section {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 28px;
+    }
+
+    .toggle-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--ados-text-secondary);
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px;
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-row:hover {
+      background: var(--bg-light);
+      border-color: var(--ados-verde);
+    }
+
+    .toggle-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .toggle-label {
+      font-size: 14px;
+      color: var(--ados-tinta);
+      cursor: pointer;
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .toggle-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      background: white;
+      flex-shrink: 0;
+      font-weight: bold;
+      font-size: 14px;
+      color: var(--ados-verde);
+    }
+
+    .toggle-checkbox:hover {
+      border-color: var(--ados-verde);
+    }
+
+    .toggle-checkbox.checked {
+      background: var(--ados-verde);
+      border-color: var(--ados-verde);
+      color: white;
+    }
+
+    .toggle-fields {
+      display: none;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: all 0.3s ease;
+      margin-top: 0;
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
+    }
+
+    .toggle-fields.visible {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 16px;
+      padding: 16px 0;
+      border-top: 1px solid var(--border-light);
+      max-height: 500px;
+    }
+
+    .toggle-fields .input-field {
+      background: var(--bg-light);
+      border: 1px solid var(--border-light);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    /* COMPARISON */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+      margin-bottom: 60px;
+    }
+
+    @media (max-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .comparison-card {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 36px;
+    }
+
+    .comparison-card.ados {
+      background: var(--ados-tinta);
+      border-color: var(--ados-tinta);
+      color: var(--ados-hueso);
+    }
+
+    .comparison-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .comparison-card.ados .comparison-header {
+      color: var(--ados-verde);
+    }
+
+    .comparison-badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .comparison-amount {
+      font-size: 52px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 10px;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .comparison-card.ados .comparison-amount {
+      color: var(--ados-verde);
+    }
+
+    .comparison-clp {
+      font-size: 13px;
+      color: var(--ados-text-secondary);
+      margin-bottom: 14px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .comparison-card.ados .comparison-clp {
+      color: rgba(242,244,241,0.8);
+    }
+
+    .comparison-period {
+      font-size: 12px;
+      color: var(--ados-text-secondary);
+    }
+
+    .comparison-card.ados .comparison-period {
+      color: rgba(242,244,241,0.8);
+    }
+
+    /* SAVINGS HERO */
+    .savings-hero {
+      background: var(--ados-tinta);
+      border-radius: 12px;
+      padding: 70px 50px;
+      text-align: center;
+      margin-bottom: 48px;
+      color: var(--ados-hueso);
+    }
+
+    .savings-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--ados-verde);
+      margin-bottom: 20px;
+    }
+
+    .savings-amount {
+      font-size: 68px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--ados-verde);
+      margin-bottom: 12px;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .savings-clp {
+      font-size: 18px;
+      color: rgba(242,244,241,0.9);
+      margin-bottom: 24px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .savings-percent {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--ados-verde);
+    }
+
+    /* COST SUMMARY */
+    .cost-summary {
+      background: var(--bg-light);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 36px;
+      margin-bottom: 50px;
+    }
+
+    .cost-summary-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--ados-text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .cost-summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 14px;
+    }
+
+    .cost-summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .cost-summary-label {
+      color: var(--ados-text-secondary);
+    }
+
+    .cost-summary-value {
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--ados-tinta);
+    }
+
+    .cost-summary-value.highlight {
+      color: var(--ados-verde);
+    }
+
+    /* BREAKDOWN */
+    .accordion {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .accordion-header {
+      padding: 20px 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s ease;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .accordion-header:hover {
+      background: var(--bg-light);
+    }
+
+    .accordion-header-icon {
+      font-size: 14px;
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-header.active .accordion-header-icon {
+      transform: rotate(180deg);
+    }
+
+    .accordion-content {
+      display: none;
+      padding: 24px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .accordion-content.visible {
+      display: block;
+    }
+
+    .breakdown-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .breakdown-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--ados-text-secondary);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .breakdown-table td {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .breakdown-table td:last-child {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    /* NAVIGATION */
+    .nav-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .btn-nav {
+      flex: 1;
+      padding: 14px 20px;
+      border: 1px solid var(--border-light);
+      background: white;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.3px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .btn-nav:hover {
+      border-color: var(--ados-verde);
+      background: rgba(51, 217, 139, 0.05);
+    }
+
+    .btn-nav.primary {
+      background: var(--ados-verde);
+      color: var(--ados-tinta);
+      border-color: var(--ados-verde);
+      font-weight: 700;
+    }
+
+    .btn-nav.primary:hover {
+      background: var(--ados-verde-deep);
+      border-color: var(--ados-verde-deep);
+      color: white;
+    }
+
+    /* CTA FINAL */
+    .cta-final {
+      background: var(--ados-tinta);
+      border-radius: 12px;
+      padding: 60px 40px;
+      text-align: center;
+      color: var(--ados-hueso);
+    }
+
+    .cta-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: 0.3px;
+    }
+
+    .cta-amount {
+      font-size: 56px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--ados-verde);
+      margin-bottom: 12px;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .cta-subtitle {
+      font-size: 15px;
+      color: rgba(242,244,241,0.9);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .cta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .cta-buttons .btn-primary {
+      width: 100%;
+      background: var(--ados-verde);
+      color: var(--ados-tinta);
+      font-weight: 700;
+    }
+
+    .cta-buttons .btn-primary:hover {
+      background: var(--ados-verde-deep);
+    }
+
+    .cta-buttons .btn-secondary {
+      width: 100%;
+      background: transparent;
+      color: var(--ados-hueso);
+      border: 1px solid var(--ados-hueso);
+    }
+
+    .cta-buttons .btn-secondary:hover {
+      background: rgba(242,244,241,0.1);
+      border-color: var(--ados-hueso);
+    }
+
+    .cta-disclaimer {
+      font-size: 11px;
+      color: rgba(242,244,241,0.7);
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(242,244,241,0.2);
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border-light);
+      text-align: center;
+      color: var(--ados-text-secondary);
+      font-size: 11px;
+      letter-spacing: 0.3px;
+    }
+
+    .footer a {
+      color: var(--ados-verde);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        padding: 40px 24px;
+      }
+    }
+    
+    /* VALIDATION */
+    .validation-error { display: none; background: #fee; border-left: 3px solid #c33; padding: 12px; border-radius: 4px; margin-top: 12px; font-size: 13px; color: #933; }
+    .validation-error.show { display: block; }
+    .validation-warning { display: none; background: #ffd; border-left: 3px solid #f90; padding: 12px; border-radius: 4px; margin-top: 12px; font-size: 13px; color: #930; }
+    .validation-warning.show { display: block; }
+    input.error-field { border-color: #c33 !important; }
+
+    
+    /* DARK MODE */
+    body.dark-mode { background: #0a0c0e; color: #f5f5f5; }
+    body.dark-mode .container { background: #0a0c0e; }
+    body.dark-mode .screen-intro { background: #1a1f26; color: #f5f5f5; }
+    body.dark-mode .header { border-bottom-color: #333; }
+    body.dark-mode .progress-step { background: #333; }
+    body.dark-mode .progress-step.active { background: #33D98B; }
+    body.dark-mode .progress-label { color: #999; }
+    body.dark-mode input, body.dark-mode textarea, body.dark-mode select { background: #1a1f26; color: #f5f5f5; border-color: #333; }
+    body.dark-mode .row { border-color: #333; }
+    body.dark-mode .field-group { border-color: #333; }
+    body.dark-mode .comparison-box { background: #1a1f26; border-color: #333; }
+    body.dark-mode .accordion-header { background: #1a1f26; border-color: #333; }
+    body.dark-mode .accordion-content { background: #1a1f26; }
+    
+    .dark-mode-toggle { position: fixed; top: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #33D98B; border: none; color: #0E1013; font-size: 22px; cursor: pointer; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s; }
+    .dark-mode-toggle:hover { transform: scale(1.1); }
     body.dark-mode .dark-mode-toggle { background: #FFD700; }
 
-    .saved-quotes { background: #1A1E24; padding: 20px; border-radius: 8px; margin-top: 20px; }
-    .saved-quote-item { background: #0E1013; padding: 12px; margin: 8px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
-    .quote-info { text-align: left; }
-    .quote-name { font-weight: 600; margin-bottom: 4px; }
-    .quote-date { font-size: 12px; color: #999; }
-    .quote-btns { display: flex; gap: 8px; }
-    .quote-btn { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; }
+    
+    /* SAVED QUOTES */
+    .saved-quotes-panel { background: #F9FAFB; padding: 24px; border-radius: 8px; margin-top: 24px; border: 1px solid #E5E7EB; }
+    .saved-quotes-panel h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; color: #33D98B; margin-bottom: 16px; letter-spacing: 0.5px; }
+    .saved-quote-item { background: white; padding: 12px 16px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-left: 3px solid #33D98B; }
+    .saved-quote-item:last-child { margin-bottom: 0; }
+    .saved-quote-info { font-size: 13px; }
+    .saved-quote-name { font-weight: 600; color: #0E1013; }
+    .saved-quote-date { font-size: 11px; color: #999; margin-top: 2px; }
+    .saved-quote-btns { display: flex; gap: 8px; }
+    .saved-quote-btns button { padding: 6px 12px; font-size: 11px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; }
     .quote-load { background: #33D98B; color: white; }
-    .quote-delete { background: #ff4444; color: white; }
+    .quote-delete { background: #ff6b6b; color: white; }
+    body.dark-mode .saved-quotes-panel { background: #1a1f26; border-color: #333; }
+    body.dark-mode .saved-quote-item { background: #252b34; }
 
-    .pdf-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+    
+    /* PDF PREVIEW */
+    .pdf-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
     .pdf-modal.show { display: flex; }
-    .pdf-modal-content { background: white; border-radius: 8px; padding: 20px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
-    .pdf-modal-header { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #0E1013; }
-    .pdf-preview { background: #f5f5f5; padding: 16px; border-radius: 6px; margin-bottom: 16px; max-height: 400px; overflow-y: auto; }
-    .pdf-preview p { margin: 8px 0; font-size: 13px; color: #333; }
-    .pdf-modal-btns { display: flex; gap: 12px; }
-    .pdf-modal-btns button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-    .pdf-download { background: #33D98B; color: white; }
-    .pdf-close { background: #ccc; color: #0E1013; }
+    .pdf-modal-content { background: white; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .pdf-modal-header { padding: 20px; border-bottom: 1px solid #E5E7EB; font-weight: 600; font-size: 16px; }
+    .pdf-modal-body { padding: 24px; font-size: 13px; line-height: 1.6; color: #333; }
+    .pdf-modal-footer { padding: 20px; border-top: 1px solid #E5E7EB; display: flex; gap: 12px; }
+    .pdf-modal-footer button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    .pdf-download-btn { background: #33D98B; color: white; }
+    .pdf-close-btn { background: #E5E7EB; color: #0E1013; }
 
-    .charts-container { margin: 24px 0; padding: 24px; background: #1A1E24; border-radius: 8px; }
-    .chart-wrapper { margin-bottom: 24px; }
-    .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #33D98B; }
+    
+    /* CHARTS */
+    .charts-section { margin-top: 24px; }
+    .chart-container { background: #F9FAFB; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .chart-container h4 { font-size: 13px; font-weight: 600; margin-bottom: 16px; color: #33D98B; }
     canvas { max-width: 100%; }
+    body.dark-mode .chart-container { background: #1a1f26; }
 
-    .mode-selector { display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid #333; }
-    .mode-btn { flex: 1; padding: 14px; border: 2px solid #33D98B; border-radius: 8px; background: transparent; color: #ccc; cursor: pointer; font-weight: 600; transition: all 0.3s; }
-    .mode-btn.active { background: #33D98B; color: #0E1013; }
-    .mode-btn:hover { opacity: 0.8; }
-    .advanced-fields { display: none; }
-    .advanced-fields.show { display: block; }
-</style>
+    
+    /* MODE SELECTOR */
+    .mode-selector { display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid #E5E7EB; }
+    .mode-btn { flex: 1; padding: 14px; border: 2px solid #E5E7EB; background: white; color: #0E1013; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .mode-btn.active { border-color: #33D98B; background: #33D98B; color: white; }
+    body.dark-mode .mode-selector { border-top-color: #333; }
+    body.dark-mode .mode-btn { background: #1a1f26; border-color: #333; color: #f5f5f5; }
+    body.dark-mode .mode-btn.active { background: #33D98B; border-color: #33D98B; color: #0E1013; }
+
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙</button>
 
-  <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙</button>
 <div class="container">
-  <!-- Pantalla 0: Intro -->
-  <div class="screen active" id="screen-0">
-    <p style="font-size: 12px; color: #33D98B; margin-bottom: 40px;">⚖️ SIMULADOR</p>
-    <h1>Haz visible el costo real de tu operación legal.</h1>
-    <p>Compara tu costo actual contra ADOS. Descubre cuánto ahorras considerando todos los costos.</p>
-    <p style="font-size: 14px; color: #999; margin-bottom: 40px;">Toma menos de 2 minutos · Resultados referenciales</p>
-    <button class="btn btn-primary" onclick="nextScreen()">Calcular mi ahorro →</button>
-  </div>
-
-  <!-- Pantalla 1: Volumen -->
-  <div class="screen" id="screen-1">
-    <h1>¿Cuál es tu volumen mensual?</h1>
-    <p style="margin-bottom: 40px;">Informes de validación de personería</p>
-    <input type="number" id="informes" value="15" min="0">
-    <p style="margin: 30px 0; font-size: 14px; color: #999;">Procesos con contrato</p>
-    <input type="number" id="procesos" value="20" min="0">
-    
-    <div style="margin-top: 50px;">
-      <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
-      <button class="btn btn-primary" onclick="nextScreen()">Continuar →</button>
-    
-    <div class="error-msg" id="error-vol">Ingresa al menos 1 informe o proceso</div>
-    <div class="warning-msg" id="warning-vol">Volumen muy alto (>200) - verifica los datos</div>
-</div>
-  </div>
-
-  <!-- Pantalla 2: Proveedor -->
-  <div class="screen" id="screen-2">
-    <h1>¿Cuál es tu costo actual?</h1>
-    <p style="margin-bottom: 40px;">Precio por informe (UF)</p>
-    <input type="number" id="price-inf" value="3" min="0" step="0.1">
-    <p style="margin: 30px 0; font-size: 14px; color: #999;">Precio por proceso (UF)</p>
-    <input type="number" id="price-proc" value="2.5" min="0" step="0.1">
-    
-    <div style="margin-top: 50px;">
-      <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
-      <button class="btn btn-primary" onclick="nextScreen()">Ver ahorro →</button>
-    
-    <div class="error-msg" id="error-price">Los precios deben ser mayores a 0</div>
-    <div class="warning-msg" id="warning-price">Precios muy altos - verifica los datos</div>
-</div>
-  </div>
-
-  <!-- Pantalla 3: Resultado -->
-  <div class="screen" id="screen-3">
-    <h1 style="color: #33D98B;">Tu ahorro anual</h1>
-    <div class="result">
-      <p style="font-size: 14px; color: #999;">AHORRO AÑO 1</p>
-      <p style="font-size: 36px; color: #33D98B; font-weight: 700; margin: 10px 0;" id="ahorro-total">0 UF</p>
-      <p style="font-size: 14px; color: #999; margin-top: 10px;">Costo Proveedor: <span id="cost-prov">0</span> UF/mes</p>
-      <p style="font-size: 14px; color: #999;">Costo ADOS: <span id="cost-ados">0</span> UF/mes</p>
-    </div>
-    
-    
-    
-    <div class="charts-container">
-      <div class="chart-wrapper">
-        <div class="chart-title">📊 Comparativa Mensual vs Anual</div>
-        <canvas id="comparison-chart"></canvas>
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo">
+          <div class="logo-symbol"></div>
+          <span>ADOS</span>
+        </div>
+        <div class="logo-badge">Simulador</div>
       </div>
-      <div class="chart-wrapper">
-        <div class="chart-title">📈 Ahorro Acumulado (3 Años)</div>
-        <canvas id="accumulative-chart"></canvas>
+      <a href="https://ados.solutions" class="header-link">← Volver a ADOS</a>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="progress-label" id="progressLabel">Inicio</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div>
+
+      <!-- SCREEN 0: INTRO -->
+      <div class="screen active" id="screen-0">
+        <div class="screen-intro">
+          <div class="intro-logo">⚖
+
+      <div class="mode-selector">
+        <button class="mode-btn active" id="btn-completo" onclick="setMode('completo')">📋 Modo Completo</button>
+        <button class="mode-btn" id="btn-rapido" onclick="setMode('rapido')">⚡ Modo Rápido</button>
       </div>
-    </div>
+</div>
+          <div class="intro-badge">Simulador</div>
+          <h1>Haz visible el costo real <em>de tu operación legal.</em></h1>
+          <p class="intro-subtitle">Compara tu costo actual de validación de personería contra ADOS. Descubre <strong>cuánto ahorras</strong> considerando <em>todos los costos</em>: implementación, configuración de documentos, documentos por proceso, y todo.</p>
+          <p class="intro-hint">Toma menos de <strong>2 minutos</strong> · <em>Resultados referenciales</em></p>
+          <button class="btn-primary" onclick="nextScreen()">Calcular mi ahorro →</button>
+        </div>
+      </div>
 
-    <div style="margin-top: 50px;">
-      <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
-      <button class="btn btn-secondary" onclick="nextScreen()">Ver desglose →</button>
+      <!-- SCREEN 1: VOLUMEN -->
+      <div class="screen" id="screen-1">
+        <h2>¿Cuánto procesa tu equipo?</h2>
+        <p class="screen-subtitle">Usaremos este volumen para estimar <em>tu costo operacional total.</em></p>
+
+        <div class="volume-grid">
+          <div class="volume-card">
+            <div class="volume-card-label">✓ <em>Informes sin contrato</em></div>
+            <div class="volume-controls">
+              <button class="volume-btn" onclick="setVolume('informes', Math.max(0, state.volume.informes - 1))">−</button>
+              <div class="volume-value" id="vol-informes">15</div>
+              <button class="volume-btn" onclick="setVolume('informes', state.volume.informes + 1)">+</button>
+            </div>
+            <div class="volume-hint">por mes</div>
+          </div>
+
+          <div class="volume-card">
+            <div class="volume-card-label">✓ <em>Procesos con contrato</em></div>
+            <div class="volume-controls">
+              <button class="volume-btn" onclick="setVolume('procesos', Math.max(0, state.volume.procesos - 1))">−</button>
+              <div class="volume-value" id="vol-procesos">20</div>
+              <button class="volume-btn" onclick="setVolume('procesos', state.volume.procesos + 1)">+</button>
+            </div>
+            <div class="volume-hint">por mes</div>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevScreen()">← Atrás</button>
+          <button class="btn-nav primary" onclick="nextScreen()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 2: PROVEEDOR -->
+      <div class="screen" id="screen-2">
+        <h2>¿Cómo te cobra actualmente?</h2>
+        <p class="screen-subtitle">Estructura tu proveedor en <em>tres momentos de cobro</em> independientes.</p>
+
+        <!-- TIMELINE VISUAL -->
+        <div style="background: var(--bg-light); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px; margin-bottom: 50px;">
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--ados-text-secondary); margin-bottom: 20px;">Cuándo se cobra</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; font-size: 13px; color: var(--ados-text-secondary); font-family: 'JetBrains Mono', monospace;">
+            <div style="text-align: center; padding: 16px; background: white; border: 1px solid var(--border-light); border-radius: 8px;">
+              <div style="font-weight: 700; color: var(--ados-tinta); margin-bottom: 8px;">Al comenzar</div>
+              <div style="font-size: 12px;">Implementación</div>
+            </div>
+            <div style="text-align: center; padding: 16px; background: white; border: 1px solid var(--border-light); border-radius: 8px;">
+              <div style="font-weight: 700; color: var(--ados-tinta); margin-bottom: 8px;">Al configurar</div>
+              <div style="font-size: 12px;">Documento nuevo</div>
+            </div>
+            <div style="text-align: center; padding: 16px; background: white; border: 1px solid var(--border-light); border-radius: 8px;">
+              <div style="font-weight: 700; color: var(--ados-tinta); margin-bottom: 8px;">En cada proceso</div>
+              <div style="font-size: 12px;">Documento usado</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 01: COSTOS BASE -->
+        <div class="toggle-section">
+          <span class="toggle-section-title">01 · Costos base de operación</span>
+
+          <div class="input-grid" style="margin-bottom: 0;">
+            <div class="input-field">
+              <label class="input-label">Informe sin contrato (UF)</label>
+              <input type="number" id="prov-informe" value="3" step="0.1" min="0" oninput="updateCalcs()">
+              <div class="input-hint">precio unitario</div>
+            </div>
+
+            <div class="input-field">
+              <label class="input-label">Proceso con contrato (UF)</label>
+              <input type="number" id="prov-proceso" value="2.5" step="0.1" min="0" oninput="updateCalcs()">
+              <div class="input-hint">precio unitario</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 02: IMPLEMENTACIÓN -->
+        <div class="toggle-section" style="margin-top: 28px;">
+          <span class="toggle-section-title">02 · Implementación inicial</span>
+          <p style="font-size: 13px; color: var(--ados-text-secondary); margin-bottom: 20px; font-family: 'Space Grotesk', sans-serif;">¿Existe un costo por comenzar a operar?</p>
+
+          <div class="toggle-row" onclick="toggleImplementation()" style="cursor: pointer;">
+            <label class="toggle-label" style="cursor: pointer;">Cobra implementación</label>
+            <div class="toggle-checkbox" id="toggle-impl"></div>
+          </div>
+
+          <div class="toggle-fields" id="impl-fields">
+            <div class="input-field">
+              <label class="input-label">Costo implementación (UF)</label>
+              <input type="number" id="prov-impl" value="30" step="0.5" min="0" oninput="updateCalcs()">
+              <div class="input-hint">pago único para configurar e iniciar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 03: CONFIGURACIÓN DE DOCUMENTOS -->
+        <div class="toggle-section" style="margin-top: 28px;">
+          <span class="toggle-section-title">03 · Configuración de documentos</span>
+          <p style="font-size: 13px; color: var(--ados-text-secondary); margin-bottom: 20px; font-family: 'Space Grotesk', sans-serif;">¿Te cobra por incorporar/configurar documentos adicionales?</p>
+
+          <div class="toggle-row" onclick="toggleDocConfig()" style="cursor: pointer;">
+            <label class="toggle-label" style="cursor: pointer;">Cobra configuración de documento</label>
+            <div class="toggle-checkbox" id="toggle-doc-config"></div>
+          </div>
+
+          <div class="toggle-fields" id="doc-config-fields">
+            <div class="input-field">
+              <label class="input-label">Costo por configuración (UF)</label>
+              <input type="number" id="prov-doc-config-cost" value="2" step="0.1" min="0" oninput="updateCalcs()">
+              <div class="input-hint">pago único por cada documento nuevo</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04: DOCUMENTOS POR PROCESO -->
+        <div class="toggle-section" style="margin-top: 28px;">
+          <span class="toggle-section-title">04 · Documentos adicionales por proceso</span>
+          <p style="font-size: 13px; color: var(--ados-text-secondary); margin-bottom: 20px; font-family: 'Space Grotesk', sans-serif;">¿Te cobra por los documentos que se utilizan en cada operación?</p>
+
+          <div class="toggle-row" onclick="toggleDocUsage()" style="cursor: pointer;">
+            <label class="toggle-label" style="cursor: pointer;">Cobra por documento utilizado</label>
+            <div class="toggle-checkbox" id="toggle-doc-usage"></div>
+          </div>
+
+          <div class="toggle-fields" id="doc-usage-fields">
+            <div class="input-grid" style="margin-bottom: 0;">
+              <div class="input-field">
+                <label class="input-label">Documentos adicionales promedio</label>
+                <input type="number" id="prov-doc-qty" value="2" step="0.5" min="0" oninput="updateCalcs()">
+                <div class="input-hint">por proceso (en promedio)</div>
+              </div>
+
+              <div class="input-field">
+                <label class="input-label">Costo por documento (UF)</label>
+                <input type="number" id="prov-doc-usage-cost" value="0.5" step="0.1" min="0" oninput="updateCalcs()">
+                <div class="input-hint">por cada documento utilizado</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevScreen()">← Atrás</button>
+          <button class="btn-nav primary" onclick="nextScreen()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: COMPARACIÓN -->
+      <div class="screen" id="screen-3">
+        <h2>Ahora compara <em>con ADOS</em></h2>
+        <p class="screen-subtitle">Mismo volumen. <em>Una estructura de costos</em> más simple.</p>
+
+        <div class="comparison-grid">
+          <div class="comparison-card ados">
+            <div class="comparison-header">
+              <span class="comparison-badge" style="background: var(--ados-verde);"></span>
+              ADOS
+            </div>
+            <div class="comparison-amount" id="comp-ados-monthly">30.5</div>
+            <div class="comparison-clp" id="comp-ados-clp">≈ $1.247.493</div>
+            <div class="comparison-period">/ mes</div>
+          </div>
+
+          <div class="comparison-card">
+            <div class="comparison-header">
+              <span class="comparison-badge" style="background: #EF4444;"></span>
+              Tu proveedor actual
+            </div>
+            <div class="comparison-amount" id="comp-prov-monthly">35.0</div>
+            <div class="comparison-clp" id="comp-prov-clp">≈ $1.430.452</div>
+            <div class="comparison-period">/ mes</div>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevScreen()">← Atrás</button>
+          <button class="btn-nav primary" onclick="nextScreen()">Ver ahorro →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 4: RESULTADO -->
+      <div class="screen" id="screen-4">
+        <h2>Tu operación <em>podría ahorrar</em></h2>
+
+        <div class="savings-hero">
+          <div class="savings-label">Ahorro año 1
+
+      <div class="charts-section">
+        <div class="chart-container">
+          <h4>📊 Comparativa Mensual vs Anual</h4>
+          <canvas id="chart-comparison"></canvas>
+        </div>
+        <div class="chart-container">
+          <h4>📈 Ahorro Acumulado (3 Años)</h4>
+          <canvas id="chart-accumulative"></canvas>
+        </div>
+      </div>
+</div>
+          <div class="savings-amount" id="savings-amount">86 UF</div>
+          <div class="savings-clp" id="savings-clp">≈ $3.517.028</div>
+          <div class="savings-percent" id="savings-percent">19.0%</div>
+        </div>
+
+        <div class="cost-summary">
+          <div class="cost-summary-title">Desglose por período</div>
+          <div class="cost-summary-row">
+            <span class="cost-summary-label">Costo mensual ADOS</span>
+            <span class="cost-summary-value" id="summary-ados-monthly">30.5 UF</span>
+          </div>
+          <div class="cost-summary-row">
+            <span class="cost-summary-label">Costo mensual proveedor</span>
+            <span class="cost-summary-value" id="summary-prov-monthly">35.0 UF</span>
+          </div>
+          <div class="cost-summary-row">
+            <span class="cost-summary-label">Total Año 1 (ADOS)</span>
+            <span class="cost-summary-value" id="summary-ados-year1">366 UF</span>
+          </div>
+          <div class="cost-summary-row">
+            <span class="cost-summary-label">Total Año 1 (Proveedor)</span>
+            <span class="cost-summary-value" id="summary-prov-year1">452 UF</span>
+          </div>
+          <div class="cost-summary-row">
+            <span class="cost-summary-label">Desde Año 2 (ADOS)</span>
+            <span class="cost-summary-value" id="summary-ados-year2">366 UF</span>
+          </div>
+          <div class="cost-summary-row">
+            <span class="cost-summary-label">Desde Año 2 (Proveedor)</span>
+            <span class="cost-summary-value" id="summary-prov-year2">420 UF</span>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevScreen()">← Atrás</button>
+          <button class="btn-nav primary" onclick="nextScreen()">Ver desglose →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 5: DESGLOSE -->
+      <div class="screen" id="screen-5">
+        <h2>Cómo <em>calculamos</em> tu ahorro</h2>
+
+        <div class="accordion">
+          <div class="accordion-header active" onclick="toggleAccordion(this)">
+            <span>✓ Costos recurrentes mensuales</span>
+            <span class="accordion-header-icon">↓</span>
+          </div>
+          <div class="accordion-content visible">
+            <table class="breakdown-table">
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  <th>ADOS</th>
+                  <th>Tu proveedor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="breakdown-info-label">15 informes × 0.7 UF</td>
+                  <td id="breakdown-info-ados">10.5 UF</td>
+                  <td id="breakdown-info-prov">45.0 UF</td>
+                </tr>
+                <tr>
+                  <td id="breakdown-proc-label">20 procesos × 1.0 UF</td>
+                  <td id="breakdown-proc-ados">20.0 UF</td>
+                  <td id="breakdown-proc-prov">50.0 UF</td>
+                </tr>
+                <tr style="border-top: 2px solid var(--border-light); font-weight: 700;">
+                  <td>Subtotal recurrente</td>
+                  <td id="breakdown-monthly-ados">30.5 UF</td>
+                  <td id="breakdown-monthly-prov">95.0 UF</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>✓ Documentos adicionales por proceso</span>
+            <span class="accordion-header-icon">↓</span>
+          </div>
+          <div class="accordion-content">
+            <table class="breakdown-table">
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  <th>ADOS</th>
+                  <th>Tu proveedor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="breakdown-docs-label">0 docs × 0 UF</td>
+                  <td id="breakdown-docs-ados">0 UF</td>
+                  <td id="breakdown-docs-prov">0 UF</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>✓ Costos únicos (Año 1)</span>
+            <span class="accordion-header-icon">↓</span>
+          </div>
+          <div class="accordion-content">
+            <table class="breakdown-table">
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  <th>ADOS</th>
+                  <th>Tu proveedor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Implementación</td>
+                  <td>0 UF</td>
+                  <td id="breakdown-impl-prov">0 UF</td>
+                </tr>
+                <tr>
+                  <td>Configuración de documentos</td>
+                  <td>0 UF</td>
+                  <td id="breakdown-config-prov">0 UF</td>
+                </tr>
+                <tr style="border-top: 2px solid var(--border-light); font-weight: 700;">
+                  <td>Total costos únicos</td>
+                  <td>0 UF</td>
+                  <td id="breakdown-onetimes-prov">0 UF</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>✓ Total anual proyectado</span>
+            <span class="accordion-header-icon">↓</span>
+          </div>
+          <div class="accordion-content">
+            <table class="breakdown-table">
+              <thead>
+                <tr>
+                  <th>Período</th>
+                  <th>ADOS</th>
+                  <th>Tu proveedor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Año 1 (incl. costos únicos)</strong></td>
+                  <td id="breakdown-y1-ados">366 UF</td>
+                  <td id="breakdown-y1-prov">452 UF</td>
+                </tr>
+                <tr>
+                  <td><strong>Año 2+ (sin costos únicos)</strong></td>
+                  <td id="breakdown-y2-ados">366 UF</td>
+                  <td id="breakdown-y2-prov">420 UF</td>
+                </tr>
+                <tr>
+                  <td><strong>Ahorro acumulado 3 años</strong></td>
+                  <td id="breakdown-3yr-ados">1.098 UF</td>
+                  <td>N/A</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>✓ Filosofía de cálculo</span>
+            <span class="accordion-header-icon">↓</span>
+          </div>
+          <div class="accordion-content">
+            <p style="font-size: 14px; color: var(--ados-text-secondary); line-height: 1.8; font-family: 'Space Grotesk', sans-serif;">
+              <strong>Año 1:</strong> Incluye 12 meses de costos recurrentes (base + documentos por proceso) + costos únicos (implementación + configuración).
+            </p>
+            <p style="font-size: 14px; color: var(--ados-text-secondary); line-height: 1.8; margin-top: 14px; font-family: 'Space Grotesk', sans-serif;">
+              <strong>Año 2 en adelante:</strong> Solo costos recurrentes (los únicos no se repiten).
+            </p>
+            <p style="font-size: 14px; color: var(--ados-text-secondary); line-height: 1.8; margin-top: 14px; font-family: 'Space Grotesk', sans-serif;">
+              <strong>ADOS</strong> tiene un modelo completamente recurrente: <strong>0.7 UF</strong> por informe y <strong>1.0 UF</strong> por proceso (que incluye contrato, personería, UAF, PEP, Anexos, Carta Poder, etc.) <em>sin costos adicionales.</em>
+            </p>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevScreen()">← Atrás</button>
+          <button class="btn-nav primary" onclick="nextScreen()">Continuar →</button>
+
+      <button class="btn-secondary" onclick="previewPDF()" style="margin-top: 12px;">📄 Vista Previa PDF</button>
+      <button class="btn-secondary" onclick="shareSimulation()" style="margin-top: 12px;">📤 Compartir</button>
+      <button class="btn-secondary" onclick="saveCurrentQuote()" style="margin-top: 12px;">💾 Guardar Cotización</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 6: CTA -->
+      <div class="screen" id="screen-6">
+
+      <div class="saved-quotes-panel">
+        <h3>💾 Mis Cotizaciones Guardadas</h3>
+        <div id="saved-quotes-container"></div>
+      </div>
+
+        <div class="cta-final">
+          <h3 class="cta-title">Tu operación <em>podría ahorrar</em></h3>
+          <div class="cta-amount" id="cta-savings">$3.5 MM</div>
+          <p class="cta-subtitle" id="cta-subtitle"><em>al año con ADOS</em> (19% de ahorro)</p>
+
+          <div class="cta-buttons">
+            <button class="btn-primary" onclick="scheduleDemo()">Agendar una demo →</button>
+            <button class="btn-secondary" onclick="downloadSimulation()">Descargar simulación</button>
+            <button class="btn-secondary" onclick="shareSimulation()">Compartir</button>
+          </div>
+
+          <div class="cta-disclaimer">
+            Los resultados son estimativos y dependen de los valores ingresados. El cálculo considera costos recurrentes, documentos adicionales y costos únicos de configuración.
+          </div>
+        </div>
+
+        <div class="footer">
+          <p><strong>ADOS</strong> · Personería, resuelta. · <a href="https://ados.solutions">ados.solutions</a></p>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- Pantalla 4: Desglose -->
-  <div class="screen" id="screen-4">
-    <h1>Desglose detallado</h1>
-    <div class="result">
-      <p style="font-size: 14px; color: #999;">PROVEEDOR ACTUAL</p>
-      <p style="margin: 10px 0;">Mes: <span id="detail-prov-mes">0</span> UF</p>
-      <p style="margin: 10px 0;">Año 1: <span id="detail-prov-anual">0</span> UF</p>
-    </div>
-    <div class="result">
-      <p style="font-size: 14px; color: #999;">ADOS SOLUTIONS</p>
-      <p style="margin: 10px 0;">Mes: <span id="detail-ados-mes">0</span> UF</p>
-      <p style="margin: 10px 0;">Año 1: <span id="detail-ados-anual">0</span> UF</p>
-    </div>
-    
-    <div style="margin-top: 50px;">
-      <button class="btn btn-secondary" onclick="prevScreen()">← Atrás</button>
-      <button class="btn btn-secondary" onclick="gotoStart()">Nueva simulación
-    <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="previewPDF()">📄 Vista Previa PDF</button>
-    
-    <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="sharePDF()">📤 Compartir PDF</button>
-    <button class="btn btn-secondary" style="margin-bottom: 12px;" onclick="scheduleDemo()">📅 Agendar Demo</button>
+  <script>
+    const UF_VALUE = 40867.18;
+    const ADOS_PRICING = { informe: 0.7, proceso: 1.0 };
 
-
-    <div class="mode-selector">
-      <button class="mode-btn active" id="btn-completo" onclick="setMode('completo')">📋 Modo Completo</button>
-      <button class="mode-btn" id="btn-rapido" onclick="setMode('rapido')">⚡ Modo Rápido</button>
-    </div>
-</button>
-    
-    
-    <div class="saved-quotes">
-      <p style="font-size: 12px; color: #33D98B; text-transform: uppercase; margin-bottom: 16px;">📋 Mis cotizaciones guardadas</p>
-      <div id="saved-quotes-list"></div>
-      <button class="btn btn-secondary" style="margin-top: 12px; width: 100%;" onclick="saveCurrentQuote()">💾 Guardar esta cotización</button>
-    </div>
-</div>
-  </div>
-</div>
-
-<script>
-  let currentScreen = 0;
-  const UF_VALUE = 40867.18;
-
-
-
-  function saveCurrentQuote() {
-    const name = prompt('Nombre de la cotización:', 'Cotización ' + new Date().toLocaleDateString('es-CL'));
-    if (!name) return;
-
-    const quote = {
-      id: Date.now(),
-      name: name,
-      date: new Date().toLocaleString('es-CL'),
-      data: {
-        informes: window.informes,
-        procesos: window.procesos,
-        priceInf: parseFloat(document.getElementById('price-inf').value),
-        priceProc: parseFloat(document.getElementById('price-proc').value)
+    let currentScreen = 0;
+    let state = {
+      volume: { informes: 15, procesos: 20 },
+      provider: { 
+        informe: 3, 
+        proceso: 2.5, 
+        hasImpl: false, 
+        impl: 30,
+        hasDocConfig: false,
+        docConfigCost: 2,
+        hasDocUsage: false,
+        docQty: 2,
+        docUsageCost: 0.5
       }
     };
 
-    let quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
-    quotes.unshift(quote);
-    if (quotes.length > 5) quotes.pop();
-    localStorage.setItem('ados-quotes', JSON.stringify(quotes));
-
-    updateSavedQuotesList();
-    alert('✅ Cotización guardada: ' + name);
-  }
-
-  function updateSavedQuotesList() {
-    const quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
-    const listDiv = document.getElementById('saved-quotes-list');
-    
-    if (quotes.length === 0) {
-      listDiv.innerHTML = '<p style="color: #999; font-size: 14px;">No hay cotizaciones guardadas</p>';
-      return;
+    function calcMonthlyRecurringADOS() {
+      return state.volume.informes * ADOS_PRICING.informe + state.volume.procesos * ADOS_PRICING.proceso;
     }
 
-    listDiv.innerHTML = quotes.map(q => `
-      <div class="saved-quote-item">
-        <div class="quote-info">
-          <div class="quote-name">${q.name}</div>
-          <div class="quote-date">${q.date}</div>
-        </div>
-        <div class="quote-btns">
-          <button class="quote-btn quote-load" onclick="loadQuote(${q.id})">Cargar</button>
-          <button class="quote-btn quote-delete" onclick="deleteQuote(${q.id})">Eliminar</button>
-        </div>
-      </div>
-    `).join('');
-  }
+    function calcMonthlyRecurringProvider() {
+      return state.volume.informes * state.provider.informe + state.volume.procesos * state.provider.proceso;
+    }
 
-  function loadQuote(id) {
-    const quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
-    const quote = quotes.find(q => q.id === id);
-    if (!quote) return;
+    function calcMonthlyDocUsageProvider() {
+      if (!state.provider.hasDocUsage) return 0;
+      return state.volume.procesos * state.provider.docQty * state.provider.docUsageCost;
+    }
 
-    window.informes = quote.data.informes;
-    window.procesos = quote.data.procesos;
-    document.getElementById('informes').value = quote.data.informes;
-    document.getElementById('procesos').value = quote.data.procesos;
-    document.getElementById('price-inf').value = quote.data.priceInf;
-    document.getElementById('price-proc').value = quote.data.priceProc;
+    function calcInitialCostsProvider() {
+      let total = 0;
+      if (state.provider.hasImpl) total += state.provider.impl;
+      if (state.provider.hasDocConfig) total += state.provider.docConfigCost;
+      return total;
+    }
 
-    currentScreen = 0;
-    updateScreen();
-    alert('✅ Cotización cargada: ' + quote.name);
-  }
+    function calcYear1ADOS() { 
+      return calcMonthlyRecurringADOS() * 12;
+    }
 
-  function deleteQuote(id) {
-    if (!confirm('¿Eliminar esta cotización?')) return;
-    let quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
-    quotes = quotes.filter(q => q.id !== id);
-    localStorage.setItem('ados-quotes', JSON.stringify(quotes));
-    updateSavedQuotesList();
-  }
+    function calcYear1Provider() { 
+      return (calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider()) * 12 + calcInitialCostsProvider();
+    }
 
+    function calcYear2ADOS() { 
+      return calcMonthlyRecurringADOS() * 12;
+    }
 
-  function generatePDFContent() {
-    const info = window.informes || 0;
-    const proc = window.procesos || 0;
-    const priceInf = parseFloat(document.getElementById('price-inf').value) || 0;
-    const priceProc = parseFloat(document.getElementById('price-proc').value) || 0;
+    function calcYear2Provider() { 
+      return (calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider()) * 12;
+    }
 
-    const costProvMes = (info * priceInf) + (proc * priceProc);
-    const costProvAnual = costProvMes * 12;
-    const costAdosMes = (info * 0.7) + (proc * 1.0);
-    const costAdosAnual = costAdosMes * 12;
-    const ahorro = costProvAnual - costAdosAnual;
-    const pct = ((ahorro / costProvAnual) * 100).toFixed(1);
+    function calcAnnualSavings() { 
+      return calcYear1Provider() - calcYear1ADOS();
+    }
 
-    return `
-      <div style="font-family: Arial; color: #333;">
-        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #33D98B; padding-bottom: 16px;">
-          <div style="font-size: 12px; color: #999;">⚖️ ADOS SIMULADOR</div>
-          <div style="font-size: 24px; font-weight: bold; color: #0E1013;">Cotización de Ahorro</div>
-        </div>
-        
-        <div style="margin: 20px 0;">
-          <p><strong>Tu Volumen:</strong></p>
-          <p>• Informes de Personería: ${info}</p>
-          <p>• Procesos con Contrato: ${proc}</p>
-        </div>
-
-        <div style="margin: 20px 0; background: #f5f5f5; padding: 12px; border-radius: 6px;">
-          <p><strong>Costo Actual (Proveedor):</strong></p>
-          <p>Mensual: ${costProvMes.toFixed(2)} UF</p>
-          <p>Anual (Año 1): ${costProvAnual.toFixed(2)} UF</p>
-        </div>
-
-        <div style="margin: 20px 0; background: #e8f9f2; padding: 12px; border-radius: 6px; border-left: 4px solid #33D98B;">
-          <p><strong>Costo ADOS:</strong></p>
-          <p>Mensual: ${costAdosMes.toFixed(2)} UF</p>
-          <p>Anual (Año 1): ${costAdosAnual.toFixed(2)} UF</p>
-        </div>
-
-        <div style="margin: 20px 0; background: #fff9e6; padding: 12px; border-radius: 6px; border-left: 4px solid #33D98B;">
-          <p><strong>Tu Ahorro Año 1:</strong></p>
-          <p style="font-size: 20px; color: #33D98B; font-weight: bold;">${ahorro.toFixed(2)} UF (${pct}%)</p>
-        </div>
-
-        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #ddd; font-size: 11px; color: #999;">
-          <p>Simulación referencial. Agendar demo en ados.solutions para validar.</p>
-          <p>Fecha: ${new Date().toLocaleString('es-CL')}</p>
-        </div>
-      </div>
-    `;
-  }
-
-  function previewPDF() {
-    const content = generatePDFContent();
-    document.getElementById('pdf-preview-content').innerHTML = content;
-    document.getElementById('pdf-modal').classList.add('show');
-  }
-
-  function closePDFModal() {
-    document.getElementById('pdf-modal').classList.remove('show');
-  }
-
-  function downloadPDF() {
-    const element = document.getElementById('pdf-preview-content');
-    const opt = {
-      margin: 10,
-      filename: 'Cotizacion_ADOS_' + window.informes + '_' + window.procesos + '.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-    };
-    html2pdf().set(opt).from(element).save();
-    alert('✅ PDF descargado');
-  }
+    function calcSavingsPercent() { 
+      const p = calcYear1Provider(); 
+      return p > 0 ? (calcAnnualSavings() / p * 100) : 0;
+    }
 
 
-  let chartComparison = null;
-  let chartAccumulative = null;
 
-  function destroyCharts() {
-    if (chartComparison) { chartComparison.destroy(); chartComparison = null; }
-    if (chartAccumulative) { chartAccumulative.destroy(); chartAccumulative = null; }
-  }
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('ados-dark-mode', document.body.classList.contains('dark-mode'));
+    }
+    
+    function initDarkMode() {
+      if (localStorage.getItem('ados-dark-mode') === 'true') {
+        document.body.classList.add('dark-mode');
+      }
+    }
 
-  function createCharts() {
-    destroyCharts();
-
-    const info = window.informes || 0;
-    const proc = window.procesos || 0;
-    const priceInf = parseFloat(document.getElementById('price-inf').value) || 0;
-    const priceProc = parseFloat(document.getElementById('price-proc').value) || 0;
-
-    const costProvMes = (info * priceInf) + (proc * priceProc);
-    const costProvYear1 = costProvMes * 12;
-    const costAdosMes = (info * 0.7) + (proc * 1.0);
-    const costAdosYear1 = costAdosMes * 12;
-
-    // Gráfico de barras: Comparativa
-    const ctxComp = document.getElementById('comparison-chart').getContext('2d');
-    chartComparison = new Chart(ctxComp, {
-      type: 'bar',
-      data: {
-        labels: ['Costo Mensual (UF)', 'Costo Anual (UF)'],
-        datasets: [
-          {
-            label: 'Tu Proveedor',
-            data: [costProvMes.toFixed(2), costProvYear1.toFixed(2)],
-            backgroundColor: 'rgba(155, 161, 166, 0.6)',
-            borderColor: '#9BA1A6',
-            borderWidth: 2
-          },
-          {
-            label: 'ADOS',
-            data: [costAdosMes.toFixed(2), costAdosYear1.toFixed(2)],
-            backgroundColor: 'rgba(51, 217, 139, 0.6)',
-            borderColor: '#33D98B',
-            borderWidth: 2
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { labels: { color: '#ccc', font: { size: 12 } } }
-        },
-        scales: {
-          y: { ticks: { color: '#999' }, grid: { color: '#333' } },
-          x: { ticks: { color: '#999' }, grid: { color: '#333' } }
+    function validateInputs() {
+      const vol = state.volume.informes + state.volume.procesos;
+      const provInf = state.provider.informe;
+      const provProc = state.provider.proceso;
+      
+      // Limpiar errores previos
+      document.querySelectorAll('.validation-error, .validation-warning').forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('input').forEach(el => el.classList.remove('error-field'));
+      
+      let isValid = true;
+      
+      // Validar volumen
+      if (currentScreen === 1) {
+        if (vol < 1) {
+          const err = document.getElementById('volume-error') || document.createElement('div');
+          err.id = 'volume-error';
+          err.className = 'validation-error show';
+          err.textContent = '⚠️ Ingresa al menos 1 informe o proceso';
+          document.getElementById('screen-1').appendChild(err);
+          isValid = false;
+        }
+        if (vol > 200) {
+          const warn = document.getElementById('volume-warning') || document.createElement('div');
+          warn.id = 'volume-warning';
+          warn.className = 'validation-warning show';
+          warn.textContent = '⚠️ Volumen muy alto (>200) - verifica los datos';
+          document.getElementById('screen-1').appendChild(warn);
         }
       }
-    });
-
-    // Gráfico de línea: Ahorro acumulado
-    const savingsPerYear = costProvMes - costAdosMes;
-    const ctxAcc = document.getElementById('accumulative-chart').getContext('2d');
-    chartAccumulative = new Chart(ctxAcc, {
-      type: 'line',
-      data: {
-        labels: ['Año 1', 'Año 2', 'Año 3'],
-        datasets: [{
-          label: 'Ahorro Acumulado (UF)',
-          data: [
-            costProvYear1 - costAdosYear1,
-            (costProvYear1 - costAdosYear1) + (costProvMes - costAdosMes) * 12,
-            (costProvYear1 - costAdosYear1) + (costProvMes - costAdosMes) * 24
-          ],
-          borderColor: '#33D98B',
-          backgroundColor: 'rgba(51, 217, 139, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 6,
-          pointBackgroundColor: '#33D98B',
-          pointBorderColor: '#0E1013',
-          pointBorderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { labels: { color: '#ccc', font: { size: 12 } } }
-        },
-        scales: {
-          y: { ticks: { color: '#999' }, grid: { color: '#333' } },
-          x: { ticks: { color: '#999' }, grid: { color: '#333' } }
+      
+      // Validar precios
+      if (currentScreen === 2) {
+        if (provInf <= 0 || provProc <= 0) {
+          const err = document.getElementById('price-error') || document.createElement('div');
+          err.id = 'price-error';
+          err.className = 'validation-error show';
+          err.textContent = '⚠️ Los precios deben ser mayores a 0';
+          document.getElementById('screen-2').appendChild(err);
+          isValid = false;
+        }
+        if (provInf > 10 || provProc > 10) {
+          const warn = document.getElementById('price-warning') || document.createElement('div');
+          warn.id = 'price-warning';
+          warn.className = 'validation-warning show';
+          warn.textContent = '⚠️ Precios muy altos - verifica los datos';
+          document.getElementById('screen-2').appendChild(warn);
         }
       }
-    });
-  }
-
-
-  let mode = 'completo';
-
-  function setMode(newMode) {
-    mode = newMode;
-    document.getElementById('btn-completo').classList.toggle('active', mode === 'completo');
-    document.getElementById('btn-rapido').classList.toggle('active', mode === 'rapido');
-    
-    // En modo rápido, podríamos simplificar la interfaz
-    // Por ahora solo cambia el modo
-    localStorage.setItem('ados-mode', mode);
-  }
-
-  // Inicializar modo
-  function initMode() {
-    mode = localStorage.getItem('ados-mode') || 'completo';
-    setMode(mode);
-  }
-
-
-  function sharePDF() {
-    const text = `🎉 Hola! Simulé mis costos legales en ADOS Simulador:
-📊 Volumen: ${window.informes} informes + ${window.procesos} procesos
-💰 Ahorro potencial: Agendar demo para saber
-🔗 https://simulador-ados.vercel.app
-    `;
-    
-    if (navigator.share) {
-      navigator.share({
-        title: 'ADOS Simulador',
-        text: text
-      }).catch(err => console.log('Error sharing:', err));
-    } else {
-      // Fallback: copiar al clipboard
-      navigator.clipboard.writeText(text);
-      alert('✅ Texto copiado al clipboard. Pégalo en tu chat o email.');
+      
+      return isValid;
     }
-  }
 
-  function scheduleDemo() {
-    const info = window.informes || 0;
-    const proc = window.procesos || 0;
-    const priceInf = parseFloat(document.getElementById('price-inf').value) || 0;
-    const priceProc = parseFloat(document.getElementById('price-proc').value) || 0;
-    const costProvMes = (info * priceInf) + (proc * priceProc);
-    
-    const title = 'Demo ADOS Simulador - Validar Cotización';
-    const description = `Volumen: ${info} informes + ${proc} procesos\nCosto mensual proveedor: ${costProvMes.toFixed(2)} UF`;
-    const duration = 60; // minutos
-    
-    // Google Calendar link
-    const start = new Date();
-    start.setHours(start.getHours() + 24); // Mañana
-    const end = new Date(start.getTime() + duration * 60000);
-    
-    const startStr = start.toISOString().replace(/[-:]/g, '').split('.')[0];
-    const endStr = end.toISOString().replace(/[-:]/g, '').split('.')[0];
-    
-    const calendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(title) + '&details=' + encodeURIComponent(description) + '&dates=' + startStr + 'Z/' + endStr + 'Z&location=Online&pli=1&uid=ados' + Date.now();
-    
-    window.open(calendarUrl, '_blank');
-  }
 
-  function validateInputs() {
-    const info = parseInt(document.getElementById('informes').value) || 0;
-    const proc = parseInt(document.getElementById('procesos').value) || 0;
-    const priceInf = parseFloat(document.getElementById('price-inf').value) || 0;
-    const priceProc = parseFloat(document.getElementById('price-proc').value) || 0;
-
-    // Limpiar errores
-    document.querySelectorAll('.error-msg, .warning-msg').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
-
-    // Validaciones Screen 1
-    if (currentScreen === 1) {
-      const totalVol = info + proc;
-      if (totalVol < 1) {
-        document.getElementById('error-vol').classList.add('show');
-        document.getElementById('informes').classList.add('error');
-        document.getElementById('procesos').classList.add('error');
-        return false;
+    // MEJORA #3: GUARDAR COTIZACIONES
+    function saveCurrentQuote() {
+      const name = prompt('Nombre de la cotización:', 'Cotización ' + new Date().toLocaleDateString('es-CL'));
+      if (!name) return;
+      const quote = {
+        id: Date.now(),
+        name: name,
+        date: new Date().toLocaleString('es-CL'),
+        state: JSON.parse(JSON.stringify(state))
+      };
+      let quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+      quotes.unshift(quote);
+      if (quotes.length > 5) quotes.pop();
+      localStorage.setItem('ados-quotes', JSON.stringify(quotes));
+      updateSavedQuotesList();
+      alert('✅ Cotización guardada: ' + name);
+    }
+    
+    function updateSavedQuotesList() {
+      const quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+      const container = document.getElementById('saved-quotes-container');
+      if (!container) return;
+      
+      if (quotes.length === 0) {
+        container.innerHTML = '<p style="color: #999; font-size: 13px;">No hay cotizaciones guardadas</p>';
+        return;
       }
-      if (totalVol > 200) {
-        document.getElementById('warning-vol').classList.add('show');
-      }
+      
+      container.innerHTML = quotes.map(q => `
+        <div class="saved-quote-item">
+          <div class="saved-quote-info">
+            <div class="saved-quote-name">${q.name}</div>
+            <div class="saved-quote-date">${q.date}</div>
+          </div>
+          <div class="saved-quote-btns">
+            <button class="quote-load" onclick="loadQuote(${q.id})">Cargar</button>
+            <button class="quote-delete" onclick="deleteQuote(${q.id})">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
     }
-
-    // Validaciones Screen 2
-    if (currentScreen === 2) {
-      if (priceInf <= 0 || priceProc <= 0) {
-        document.getElementById('error-price').classList.add('show');
-        document.getElementById('price-inf').classList.add('error');
-        document.getElementById('price-proc').classList.add('error');
-        return false;
-      }
-      if (priceInf > 10 || priceProc > 10) {
-        document.getElementById('warning-price').classList.add('show');
-      }
-    }
-
-    return true;
-  }
-
-
-  function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('ados-dark-mode', document.body.classList.contains('dark-mode'));
-  }
-
-  // Inicializar dark mode
-  function initDarkMode() {
-    if (localStorage.getItem('ados-dark-mode') === 'true') {
-      document.body.classList.add('dark-mode');
-    }
-  }
-
-  function nextScreen() {
-    if (!validateInputs()) return;
-
-    const info = document.getElementById('informes').value;
-    const proc = document.getElementById('procesos').value;
-
-    if (currentScreen === 0) {
-      currentScreen = 1;
-    } else if (currentScreen === 1) {
-      // Guardar valores
-      window.informes = parseInt(info) || 0;
-      window.procesos = parseInt(proc) || 0;
-      currentScreen = 2;
-    } else if (currentScreen === 2) {
-      // Calcular
-      const priceInf = parseFloat(document.getElementById('price-inf').value) || 0;
-      const priceProc = parseFloat(document.getElementById('price-proc').value) || 0;
-
-      const costProveedorMes = (window.informes * priceInf) + (window.procesos * priceProc);
-      const costProveedorAnual = costProveedorMes * 12;
-
-      const costAdosMes = (window.informes * 0.7) + (window.procesos * 1.0);
-      const costAdosAnual = costAdosMes * 12;
-
-      const ahorro = costProveedorAnual - costAdosAnual;
-
-      // Mostrar resultados
-      document.getElementById('ahorro-total').textContent = ahorro.toFixed(1) + ' UF';
-      document.getElementById('cost-prov').textContent = costProveedorMes.toFixed(2);
-      document.getElementById('cost-ados').textContent = costAdosMes.toFixed(2);
-      document.getElementById('detail-prov-mes').textContent = costProveedorMes.toFixed(2);
-      document.getElementById('detail-prov-anual').textContent = costProveedorAnual.toFixed(2);
-      document.getElementById('detail-ados-mes').textContent = costAdosMes.toFixed(2);
-      document.getElementById('detail-ados-anual').textContent = costAdosAnual.toFixed(2);
-
-      currentScreen = 3;
-      setTimeout(() => { createCharts(); }, 200);
-    } else if (currentScreen === 3) {
-      currentScreen = 4;
-    } else {
-      currentScreen = 4;
-    }
-
-    updateScreen();
-  }
-
-  function prevScreen() {
-    if (currentScreen > 0) {
-      currentScreen--;
+    
+    function loadQuote(id) {
+      const quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+      const quote = quotes.find(q => q.id === id);
+      if (!quote) return;
+      
+      state = JSON.parse(JSON.stringify(quote.state));
+      
+      document.getElementById('vol-informes').textContent = state.volume.informes;
+      document.getElementById('vol-procesos').textContent = state.volume.procesos;
+      document.getElementById('prov-informe').value = state.provider.informe;
+      document.getElementById('prov-proceso').value = state.provider.proceso;
+      document.getElementById('prov-impl').value = state.provider.impl;
+      document.getElementById('prov-doc-config-cost').value = state.provider.docConfigCost;
+      document.getElementById('prov-doc-qty').value = state.provider.docQty;
+      document.getElementById('prov-doc-usage-cost').value = state.provider.docUsageCost;
+      
+      currentScreen = 0;
       updateScreen();
-    }
-  }
-
-  function gotoStart() {
-    currentScreen = 0;
-    updateScreen();
-  }
-
-  function updateScreen() {
-    // Ocultar todas
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    // Mostrar actual
-    document.getElementById('screen-' + currentScreen).classList.add('active');
-    window.scrollTo(0, 0);
-  }
-
-  // Inicializar
-  updateScreen();
-
-
-  window.addEventListener('DOMContentLoaded', function() {
-    initDarkMode();
-    updateSavedQuotesList();
     initMode();
-    updateScreen();
-  });
+    updateSavedQuotesList();
+      alert('✅ Cotización cargada: ' + quote.name);
+    }
+    
+    function deleteQuote(id) {
+      if (!confirm('¿Eliminar esta cotización?')) return;
+      let quotes = JSON.parse(localStorage.getItem('ados-quotes') || '[]');
+      quotes = quotes.filter(q => q.id !== id);
+      localStorage.setItem('ados-quotes', JSON.stringify(quotes));
+      updateSavedQuotesList();
+    }
+    
+    // MEJORA #4: PDF
+    function previewPDF() {
+      const content = generatePDFContent();
+      const modal = document.getElementById('pdf-modal');
+      if (!modal) return;
+      document.getElementById('pdf-modal-body').innerHTML = content;
+      modal.classList.add('show');
+    }
+    
+    function closePDFModal() {
+      const modal = document.getElementById('pdf-modal');
+      if (modal) modal.classList.remove('show');
+    }
+    
+    function generatePDFContent() {
+      const adosMonthly = calcMonthlyRecurringADOS();
+      const provMonthly = calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider();
+      const adosYear1 = calcYear1ADOS();
+      const provYear1 = calcYear1Provider();
+      const savings = calcAnnualSavings();
+      const savingsPercent = calcSavingsPercent();
+      
+      return `
+        <div style="font-family: Arial, sans-serif;">
+          <h2 style="color: #33D98B; margin-bottom: 20px;">Cotización ADOS Simulador</h2>
+          <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CL')}</p>
+          
+          <h3 style="margin-top: 20px; margin-bottom: 12px; font-size: 14px;">Volumen de Operaciones</h3>
+          <p>Informes: ${state.volume.informes} | Procesos: ${state.volume.procesos}</p>
+          
+          <h3 style="margin-top: 20px; margin-bottom: 12px; font-size: 14px;">Comparativa</h3>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid #ddd;">
+              <td style="padding: 8px;"><strong>Tu Proveedor (Mensual):</strong></td>
+              <td style="padding: 8px; text-align: right;">${fmt(provMonthly)} UF</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #ddd;">
+              <td style="padding: 8px;"><strong>ADOS (Mensual):</strong></td>
+              <td style="padding: 8px; text-align: right;">${fmt(adosMonthly)} UF</td>
+            </tr>
+            <tr style="background: #e8f9f2;">
+              <td style="padding: 8px;"><strong>Tu Ahorro Año 1:</strong></td>
+              <td style="padding: 8px; text-align: right; color: #33D98B; font-weight: bold;">${fmt(savings)} UF (${savingsPercent.toFixed(1)}%)</td>
+            </tr>
+          </table>
+          
+          <p style="margin-top: 20px; font-size: 12px; color: #999;">Simulación referencial. Agendar demo para validar.</p>
+        </div>
+      `;
+    }
+    
+    function downloadPDF() {
+      const content = document.getElementById('pdf-modal-body').innerHTML;
+      const element = document.createElement('div');
+      element.innerHTML = content;
+      
+      const opt = {
+        margin: 10,
+        filename: 'Cotizacion_ADOS_' + state.volume.informes + '_' + state.volume.procesos + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      };
+      
+      html2pdf().set(opt).from(element).save();
+    }
+    
+    // MEJORA #5: GRÁFICOS
+    let chartComparison = null;
+    let chartAccumulative = null;
+    
+    function destroyCharts() {
+      if (chartComparison) { chartComparison.destroy(); chartComparison = null; }
+      if (chartAccumulative) { chartAccumulative.destroy(); chartAccumulative = null; }
+    }
+    
+    function createCharts() {
+      destroyCharts();
+      
+      const adosMonthly = calcMonthlyRecurringADOS();
+      const provMonthly = calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider();
+      const adosYear1 = calcYear1ADOS();
+      const provYear1 = calcYear1Provider();
+      
+      const ctxComp = document.getElementById('chart-comparison');
+      if (ctxComp) {
+        chartComparison = new Chart(ctxComp, {
+          type: 'bar',
+          data: {
+            labels: ['Mensual (UF)', 'Anual Año 1 (UF)'],
+            datasets: [
+              { label: 'Tu Proveedor', data: [provMonthly.toFixed(2), provYear1.toFixed(2)], backgroundColor: 'rgba(155,161,166,0.6)', borderColor: '#9BA1A6', borderWidth: 2 },
+              { label: 'ADOS', data: [adosMonthly.toFixed(2), adosYear1.toFixed(2)], backgroundColor: 'rgba(51,217,139,0.6)', borderColor: '#33D98B', borderWidth: 2 }
+            ]
+          },
+          options: { responsive: true, plugins: { legend: { labels: { font: { size: 12 } } } }, scales: { y: { grid: { color: '#e5e7eb' } }, x: { grid: { color: '#e5e7eb' } } } }
+        });
+      }
+      
+      const savingsPerYear = provMonthly - adosMonthly;
+      const ctxAcc = document.getElementById('chart-accumulative');
+      if (ctxAcc) {
+        chartAccumulative = new Chart(ctxAcc, {
+          type: 'line',
+          data: {
+            labels: ['Año 1', 'Año 2', 'Año 3'],
+            datasets: [{
+              label: 'Ahorro Acumulado (UF)',
+              data: [(provYear1 - adosYear1), (provYear1 - adosYear1) + savingsPerYear * 12, (provYear1 - adosYear1) + savingsPerYear * 24],
+              borderColor: '#33D98B',
+              backgroundColor: 'rgba(51,217,139,0.1)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 6,
+              pointBackgroundColor: '#33D98B',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2
+            }]
+          },
+          options: { responsive: true, plugins: { legend: { labels: { font: { size: 12 } } } }, scales: { y: { grid: { color: '#e5e7eb' } }, x: { grid: { color: '#e5e7eb' } } } }
+        });
+      }
+    }
+    
+    // MEJORA #6: MODO RÁPIDO
+    let mode = 'completo';
+    
+    function setMode(newMode) {
+      mode = newMode;
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      if (newMode === 'completo') {
+        document.getElementById('btn-completo').classList.add('active');
+      } else {
+        document.getElementById('btn-rapido').classList.add('active');
+      }
+      localStorage.setItem('ados-mode', mode);
+    }
+    
+    function initMode() {
+      mode = localStorage.getItem('ados-mode') || 'completo';
+      setMode(mode);
+    }
 
-</script>
+    function updateScreen() { if (currentScreen === 4) setTimeout(() => { createCharts(); }, 200);
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(`screen-${currentScreen}`).classList.add('active');
+      updateProgress();
+      updateCalcs();
+      window.scrollTo(0, 0);
+    }
+
+    function updateProgress() {
+      const pb = document.getElementById('progressBar');
+      pb.innerHTML = '';
+      for (let i = 0; i < 7; i++) {
+        const step = document.createElement('div');
+        step.className = 'progress-step';
+        if (i < currentScreen) step.classList.add('completed');
+        if (i === currentScreen) step.classList.add('active');
+        pb.appendChild(step);
+      }
+      const labels = ['Inicio', 'Volumen', 'Proveedor', 'Comparación', 'Resultado', 'Desglose', 'CTA'];
+      document.getElementById('progressLabel').textContent = currentScreen === 0 ? 'Inicio' : currentScreen === 6 ? 'Confirmación' : `0${currentScreen} de 05 — ${labels[currentScreen]}`;
+    }
+
+    function setVolume(type, value) {
+      const volType = type === 'informes' ? 'informes' : 'procesos';
+      state.volume[volType] = Math.max(0, value);
+      document.getElementById(`vol-${type}`).textContent = state.volume[volType];
+      updateCalcs();
+    }
+
+    function toggleImplementation() {
+      state.provider.hasImpl = !state.provider.hasImpl;
+      const checkbox = document.getElementById('toggle-impl');
+      checkbox.classList.toggle('checked');
+      checkbox.textContent = state.provider.hasImpl ? '✓' : '';
+      document.getElementById('impl-fields').classList.toggle('visible');
+      updateCalcs();
+    }
+
+    function toggleDocConfig() {
+      state.provider.hasDocConfig = !state.provider.hasDocConfig;
+      const checkbox = document.getElementById('toggle-doc-config');
+      checkbox.classList.toggle('checked');
+      checkbox.textContent = state.provider.hasDocConfig ? '✓' : '';
+      document.getElementById('doc-config-fields').classList.toggle('visible');
+      updateCalcs();
+    }
+
+    function toggleDocUsage() {
+      state.provider.hasDocUsage = !state.provider.hasDocUsage;
+      const checkbox = document.getElementById('toggle-doc-usage');
+      checkbox.classList.toggle('checked');
+      checkbox.textContent = state.provider.hasDocUsage ? '✓' : '';
+      document.getElementById('doc-usage-fields').classList.toggle('visible');
+      updateCalcs();
+    }
+
+    function toggleAccordion(header) {
+      const content = header.nextElementSibling;
+      header.classList.toggle('active');
+      content.classList.toggle('visible');
+    }
+
+    function updateCalcs() {
+      state.provider.informe = parseFloat(document.getElementById('prov-informe').value) || 0;
+      state.provider.proceso = parseFloat(document.getElementById('prov-proceso').value) || 0;
+      state.provider.impl = parseFloat(document.getElementById('prov-impl').value) || 0;
+      state.provider.docConfigCost = parseFloat(document.getElementById('prov-doc-config-cost').value) || 0;
+      state.provider.docQty = parseFloat(document.getElementById('prov-doc-qty').value) || 0;
+      state.provider.docUsageCost = parseFloat(document.getElementById('prov-doc-usage-cost').value) || 0;
+
+      const adosMonthly = calcMonthlyRecurringADOS();
+      const provMonthly = calcMonthlyRecurringProvider();
+      const provDocUsageMonthly = calcMonthlyDocUsageProvider();
+      const provTotalMonthly = provMonthly + provDocUsageMonthly;
+      
+      const adosYear1 = calcYear1ADOS();
+      const provYear1 = calcYear1Provider();
+      const adosYear2 = calcYear2ADOS();
+      const provYear2 = calcYear2Provider();
+      const savings = calcAnnualSavings();
+      const savingsPercent = calcSavingsPercent();
+
+      document.getElementById('comp-ados-monthly').textContent = fmt(adosMonthly);
+      document.getElementById('comp-ados-clp').textContent = `≈ ${fmtClp(adosMonthly * UF_VALUE)}`;
+      document.getElementById('comp-prov-monthly').textContent = fmt(provTotalMonthly);
+      document.getElementById('comp-prov-clp').textContent = `≈ ${fmtClp(provTotalMonthly * UF_VALUE)}`;
+
+      document.getElementById('savings-amount').textContent = fmt(savings) + ' UF';
+      document.getElementById('savings-clp').textContent = `≈ ${fmtClp(savings * UF_VALUE)}`;
+      document.getElementById('savings-percent').textContent = savingsPercent.toFixed(1) + '%';
+
+      document.getElementById('summary-ados-monthly').textContent = fmt(adosMonthly) + ' UF';
+      document.getElementById('summary-prov-monthly').textContent = fmt(provTotalMonthly) + ' UF';
+      document.getElementById('summary-ados-year1').textContent = fmt(adosYear1) + ' UF';
+      document.getElementById('summary-prov-year1').textContent = fmt(provYear1) + ' UF';
+      document.getElementById('summary-ados-year2').textContent = fmt(adosYear2) + ' UF';
+      document.getElementById('summary-prov-year2').textContent = fmt(provYear2) + ' UF';
+
+      const adosInformes = state.volume.informes * ADOS_PRICING.informe;
+      const adosProcesos = state.volume.procesos * ADOS_PRICING.proceso;
+      const provInformes = state.volume.informes * state.provider.informe;
+      const provProcesos = state.volume.procesos * state.provider.proceso;
+
+      document.getElementById('breakdown-info-label').textContent = `${state.volume.informes} informes × ${fmt(ADOS_PRICING.informe)} UF`;
+      document.getElementById('breakdown-info-ados').textContent = fmt(adosInformes) + ' UF';
+      document.getElementById('breakdown-info-prov').textContent = fmt(provInformes) + ' UF';
+
+      document.getElementById('breakdown-proc-label').textContent = `${state.volume.procesos} procesos × ${fmt(ADOS_PRICING.proceso)} UF`;
+      document.getElementById('breakdown-proc-ados').textContent = fmt(adosProcesos) + ' UF';
+      document.getElementById('breakdown-proc-prov').textContent = fmt(provProcesos) + ' UF';
+
+      document.getElementById('breakdown-monthly-ados').textContent = fmt(adosMonthly) + ' UF';
+      document.getElementById('breakdown-monthly-prov').textContent = fmt(provMonthly) + ' UF';
+
+      const docUsageLabel = state.provider.hasDocUsage 
+        ? `${Math.round(state.volume.procesos * state.provider.docQty)} docs × ${fmt(state.provider.docUsageCost)} UF`
+        : `0 documentos × 0 UF`;
+      document.getElementById('breakdown-docs-label').textContent = docUsageLabel;
+      document.getElementById('breakdown-docs-ados').textContent = '0 UF';
+      document.getElementById('breakdown-docs-prov').textContent = fmt(provDocUsageMonthly) + ' UF';
+
+      document.getElementById('breakdown-impl-prov').textContent = (state.provider.hasImpl ? fmt(state.provider.impl) : '0') + ' UF';
+      document.getElementById('breakdown-config-prov').textContent = (state.provider.hasDocConfig ? fmt(state.provider.docConfigCost) : '0') + ' UF';
+      document.getElementById('breakdown-onetimes-prov').textContent = fmt((state.provider.hasImpl ? state.provider.impl : 0) + (state.provider.hasDocConfig ? state.provider.docConfigCost : 0)) + ' UF';
+
+      document.getElementById('breakdown-y1-ados').textContent = fmt(adosYear1) + ' UF';
+      document.getElementById('breakdown-y1-prov').textContent = fmt(provYear1) + ' UF';
+      document.getElementById('breakdown-y2-ados').textContent = fmt(adosYear2) + ' UF';
+      document.getElementById('breakdown-y2-prov').textContent = fmt(provYear2) + ' UF';
+      document.getElementById('breakdown-3yr-ados').textContent = fmt(adosYear1 + adosYear2 * 2) + ' UF';
+
+      document.getElementById('cta-savings').textContent = fmtClp(savings * UF_VALUE);
+      document.getElementById('cta-subtitle').textContent = `al año con ADOS (${savingsPercent.toFixed(0)}% de ahorro)`;
+    }
+
+    function fmt(n) {
+      return parseFloat(n.toFixed(1)).toLocaleString('es-CL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    }
+
+    function fmtClp(n) {
+      return '$' + Math.round(n).toLocaleString('es-CL');
+    }
+
+    function nextScreen() { if (validateInputs() && currentScreen < 6) { currentScreen++; updateScreen(); } }
+    function prevScreen() { if (currentScreen > 0) { currentScreen--; updateScreen(); } }
+    function scheduleDemo() { window.open('https://ados.solutions', '_blank'); }
+
+    function downloadSimulation() {
+      const data = `ADOS Simulador - Simulación de costos
+Fecha: ${new Date().toLocaleDateString('es-CL')}
+
+VOLUMEN DE OPERACIONES
+Informes sin contrato: ${state.volume.informes}/mes
+Procesos con contrato: ${state.volume.procesos}/mes
+
+TU PROVEEDOR ACTUAL
+─ Costos base
+  Informe: ${fmt(state.provider.informe)} UF
+  Proceso: ${fmt(state.provider.proceso)} UF
+
+─ Costos únicos
+  Implementación: ${state.provider.hasImpl ? fmt(state.provider.impl) + ' UF' : 'No'}
+  Configuración documento: ${state.provider.hasDocConfig ? fmt(state.provider.docConfigCost) + ' UF' : 'No'}
+
+─ Costos por proceso
+  Documentos adicionales: ${state.provider.hasDocUsage ? `${fmt(state.provider.docUsageCost)} UF × ${fmt(state.provider.docQty)} docs` : 'No'}
+
+ADOS — Modelo de precios
+Informe: ${fmt(ADOS_PRICING.informe)} UF
+Proceso: ${fmt(ADOS_PRICING.proceso)} UF (incluye contrato, personería, UAF, PEP, Anexos, Carta Poder, etc)
+Implementación: No
+Documentos adicionales: No (incluidos)
+
+RESULTADO DE LA SIMULACIÓN
+Costo mensual (Proveedor): ${fmt(calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider())} UF
+Costo mensual (ADOS): ${fmt(calcMonthlyRecurringADOS())} UF
+Ahorro Año 1: ${fmt(calcAnnualSavings())} UF (${calcSavingsPercent().toFixed(1)}%)
+
+Nota: Simulación referencial. Agendar demo en ados.solutions para validar.`;
+      
+      const blob = new Blob([data], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ADOS_Simulador_Simulation.txt';
+      a.click();
+    }
+
+    function shareSimulation() {
+      const text = `ADOS Simulador: ${state.volume.informes} informes + ${state.volume.procesos} procesos = ${fmt(calcAnnualSavings())} UF de ahorro año 1 (${fmtClp(calcAnnualSavings() * UF_VALUE)})`;
+      if (navigator.share) {
+        navigator.share({ title: 'ADOS Simulador', text: text });
+      } else {
+        alert(text);
+      }
+    }
+
+    initDarkMode();
+        updateScreen();
+    initMode();
+    updateSavedQuotesList();
+  </script>
 
 
   <div class="pdf-modal" id="pdf-modal">
     <div class="pdf-modal-content">
       <div class="pdf-modal-header">Vista Previa de tu Cotización</div>
-      <div class="pdf-preview" id="pdf-preview-content"></div>
-      <div class="pdf-modal-btns">
-        <button class="pdf-download" onclick="downloadPDF()">Descargar PDF</button>
-        <button class="pdf-close" onclick="closePDFModal()">Cerrar</button>
+      <div class="pdf-modal-body" id="pdf-modal-body"></div>
+      <div class="pdf-modal-footer">
+        <button class="pdf-download-btn" onclick="downloadPDF()">Descargar PDF</button>
+        <button class="pdf-close-btn" onclick="closePDFModal()">Cerrar</button>
       </div>
     </div>
   </div>
