@@ -23,10 +23,18 @@
     .warning-msg { background: #ff9800; color: white; padding: 12px; border-radius: 6px; margin: 10px 0; font-size: 14px; display: none; }
     .error-msg.show, .warning-msg.show { display: block; }
     input.error { border-color: #ff4444 !important; }
+
+    /* Dark Mode */
+    body.dark-mode { background: #0a0d0f; }
+    body.dark-mode { --bg-light: #1a1e24; --text-light: #e0e0e0; }
+    .dark-mode-toggle { position: fixed; top: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #33D98B; border: none; color: white; font-size: 24px; cursor: pointer; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .dark-mode-toggle:hover { opacity: 0.9; }
+    body.dark-mode .dark-mode-toggle { background: #FFD700; }
 </style>
 </head>
 <body>
 
+  <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙</button>
 <div class="container">
   <!-- Pantalla 0: Intro -->
   <div class="screen active" id="screen-0">
@@ -153,6 +161,19 @@
     return true;
   }
 
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('ados-dark-mode', document.body.classList.contains('dark-mode'));
+  }
+
+  // Inicializar dark mode
+  function initDarkMode() {
+    if (localStorage.getItem('ados-dark-mode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+  }
+
   function nextScreen() {
     if (!validateInputs()) return;
 
@@ -220,6 +241,13 @@
 
   // Inicializar
   updateScreen();
+
+
+  window.addEventListener('DOMContentLoaded', function() {
+    initDarkMode();
+    updateScreen();
+  });
+
 </script>
 
 </body>
