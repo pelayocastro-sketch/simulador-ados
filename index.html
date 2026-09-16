@@ -1419,19 +1419,12 @@
 
 
     function contactExecutive() {
-      const email = prompt('¿Cuál es tu email?', '');
-      if (!email) return;
-      
-      const phone = prompt('¿Cuál es tu teléfono? (opcional)', '');
-      
       const providerMonthly = calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider();
       const adosMonthly = calcMonthlyRecurringADOS();
       
-      const message = `⚡ OPORTUNIDAD DE NEGOCIACIÓN\nQuiero hablar con un ejecutivo sobre mi cotización.\nMi proveedor actual cuesta: ${fmt(providerMonthly)} UF/mes\nADOS cuesta: ${fmt(adosMonthly)} UF/mes\n\nEmail: ${email}${phone ? '\nTeléfono: ' + phone : ''}`;
+      const message = `⚡ Quiero negociar sobre mi cotización de ADOS\nMi proveedor actual cuesta: ${fmt(providerMonthly)} UF/mes\nADOS cuesta: ${fmt(adosMonthly)} UF/mes`;
       
       window.open('https://wa.me/56945696216?text=' + encodeURIComponent(message), '_blank');
-      
-      alert('✅ Tu solicitud se ha enviado por WhatsApp.\n\nNuestro ejecutivo se contactará contigo pronto para mejorar la oferta.');
     }
 
     function updateCTABasedOnSavings() {
@@ -1469,22 +1462,6 @@
         const executivePanel = document.getElementById('executive-panel');
         if (executivePanel) executivePanel.remove();
       }
-    }
-
-    function contactExecutive() {
-      const email = prompt('¿Cuál es tu email?', '');
-      if (!email) return;
-      
-      const phone = prompt('¿Cuál es tu teléfono? (opcional)', '');
-      
-      const providerMonthly = calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider();
-      const adosMonthly = calcMonthlyRecurringADOS();
-      
-      const message = `⚡ OPORTUNIDAD DE NEGOCIACIÓN\nQuiero hablar con un ejecutivo sobre mi cotización.\nMi proveedor actual cuesta: ${fmt(providerMonthly)} UF/mes\nADOS cuesta: ${fmt(adosMonthly)} UF/mes\n\nEmail: ${email}${phone ? '\nTeléfono: ' + phone : ''}`;
-      
-      window.open('https://wa.me/56945696216?text=' + encodeURIComponent(message), '_blank');
-      
-      alert('✅ Tu solicitud se ha enviado por WhatsApp.\n\nNuestro ejecutivo se contactará contigo pronto para mejorar la oferta.');
     }
 
     function contactForm() {
