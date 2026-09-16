@@ -1534,18 +1534,14 @@
         return;
       }
       
-      const providerMonthly = calcMonthlyRecurringProvider() + calcMonthlyDocUsageProvider();
-      const adosMonthly = calcMonthlyRecurringADOS();
+      const providerPrice = state.provider.informe;
+      const adosPrice = 0.7;
       
-      const message = `👋 Solicito ver alternativas de factoring
-
-📋 Información:
-• Nombre: ${name}
-• Factoring actual: ${factoring}
-• Costo actual: ${fmt(providerMonthly)} UF/mes
-• Alternativa ADOS: ${fmt(adosMonthly)} UF/mes
-
-Quiero explorar opciones mejores. ¿Podemos conversar?`;
+      const message = `Hola Pelayo 👋
+Por aca ${name} de ${factoring} y me interesa la propuesta de ADOS, pero al compararla con nuestro proveedor actual, nos queda un poco más cara.
+Actualmente pagamos ${fmt(providerPrice)} UF por informe. ¿Me podrías indicar cuánto nos cobran por informe unitario y qué incluye ese valor?
+Quiero entender bien la diferencia y revisar si podemos mejorar la propuesta de ADOS.
+¡Gracias!`;
       
       closeExecutiveModal();
       window.open('https://wa.me/56945696216?text=' + encodeURIComponent(message), '_blank');
