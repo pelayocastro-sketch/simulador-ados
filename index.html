@@ -42,7 +42,7 @@
     .container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 60px 40px;
+      padding: 20px 40px;
     }
 
     /* HEADER */
@@ -1936,7 +1936,16 @@ Quiero entender bien la diferencia y revisar si podemos mejorar la propuesta de 
       return '$' + Math.round(n).toLocaleString('es-CL');
     }
 
-    function nextScreen() { if (validateInputs() && currentScreen < 6) { currentScreen++; updateScreen(); } }
+    function nextScreen() { 
+      console.log('nextScreen() - currentScreen:', currentScreen);
+      if (currentScreen === 0 || (validateInputs() && currentScreen < 6)) { 
+        currentScreen++; 
+        console.log('Avanzando a screen:', currentScreen);
+        updateScreen(); 
+      } else {
+        console.log('No se puede avanzar - validación fallida');
+      }
+    }
     function prevScreen() { if (currentScreen > 0) { currentScreen--; updateScreen(); } }
     function scheduleDemo() { 
       window.open('https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ0ywkDjdnl7tMZnq2KKH_F0j2jLTO2MTEXUD6WDTV86LXQfn5oIdpr4QVus8fb1qANoBYa4-yfZ', '_blank'); 
