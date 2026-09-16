@@ -1703,8 +1703,7 @@ Quiero entender bien la diferencia y revisar si podemos mejorar la propuesta de 
       
       currentScreen = 0;
       updateScreen();
-    initMode();
-    updateSavedQuotesList();
+      updateSavedQuotesList();
       alert('✅ Cotización cargada: ' + quote.name);
     }
     
@@ -1782,18 +1781,7 @@ Quiero entender bien la diferencia y revisar si podemos mejorar la propuesta de 
     // MEJORA #6: MODO RÁPIDO
     let mode = 'completo';
     
-    function setMode(newMode) {
-      mode = newMode;
-      document.querySelectorAll(' else {
-        document.getElementById('btn-rapido').classList.add('active');
-      }
-      localStorage.setItem('ados-mode', mode);
-    }
-    
-    function initMode() {
-      mode = localStorage.getItem('ados-mode') || 'completo';
-      setMode(mode);
-    }
+    // ELIMINADO: setMode e initMode (ya no son necesarios - no hay modos)
 
     function updateScreen() { if (currentScreen === 4) setTimeout(() => { createCharts(); }, 200);
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1952,8 +1940,7 @@ Quiero entender bien la diferencia y revisar si podemos mejorar la propuesta de 
     }
 
     initDarkMode();
-        updateScreen();
-    initMode();
+    updateScreen();
     updateSavedQuotesList();
   </script>
 
