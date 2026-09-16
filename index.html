@@ -1429,28 +1429,9 @@
       
       const message = `⚡ OPORTUNIDAD DE NEGOCIACIÓN\nQuiero hablar con un ejecutivo sobre mi cotización.\nMi proveedor actual cuesta: ${fmt(providerMonthly)} UF/mes\nADOS cuesta: ${fmt(adosMonthly)} UF/mes\n\nEmail: ${email}${phone ? '\nTeléfono: ' + phone : ''}`;
       
-      // Enviar por correo usando Formspree
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('phone', phone || 'No proporcionado');
-      formData.append('provider_monthly', fmt(providerMonthly));
-      formData.append('ados_monthly', fmt(adosMonthly));
-      formData.append('message', 'Solicitud de negociación - Cliente con proveedor competitivo');
-      
-      fetch('https://formspree.io/f/mldjjbql', {
-        method: 'POST',
-        body: formData
-      }).then(r => {
-        if (r.ok) {
-          console.log('✅ Email enviado');
-        }
-      }).catch(e => console.log('Email error:', e));
-      
-      // Abrir WhatsApp
       window.open('https://wa.me/56945696216?text=' + encodeURIComponent(message), '_blank');
       
-      // Confirmación
-      alert('✅ Tu solicitud se ha enviado por email y WhatsApp.\n\nNuestro ejecutivo se contactará contigo pronto para mejorar la oferta.');
+      alert('✅ Tu solicitud se ha enviado por WhatsApp.\n\nNuestro ejecutivo se contactará contigo pronto para mejorar la oferta.');
     }
 
     function updateCTABasedOnSavings() {
@@ -1501,28 +1482,9 @@
       
       const message = `⚡ OPORTUNIDAD DE NEGOCIACIÓN\nQuiero hablar con un ejecutivo sobre mi cotización.\nMi proveedor actual cuesta: ${fmt(providerMonthly)} UF/mes\nADOS cuesta: ${fmt(adosMonthly)} UF/mes\n\nEmail: ${email}${phone ? '\nTeléfono: ' + phone : ''}`;
       
-      // Enviar por correo usando Formspree
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('phone', phone || 'No proporcionado');
-      formData.append('provider_monthly', fmt(providerMonthly));
-      formData.append('ados_monthly', fmt(adosMonthly));
-      formData.append('message', 'Solicitud de negociación - Cliente con proveedor competitivo');
-      
-      fetch('https://formspree.io/f/mldjjbql', {
-        method: 'POST',
-        body: formData
-      }).then(r => {
-        if (r.ok) {
-          console.log('✅ Email enviado');
-        }
-      }).catch(e => console.log('Email error:', e));
-      
-      // Abrir WhatsApp
       window.open('https://wa.me/56945696216?text=' + encodeURIComponent(message), '_blank');
       
-      // Confirmación
-      alert('✅ Tu solicitud se ha enviado por email y WhatsApp.\n\nNuestro ejecutivo se contactará contigo pronto para mejorar la oferta.');
+      alert('✅ Tu solicitud se ha enviado por WhatsApp.\n\nNuestro ejecutivo se contactará contigo pronto para mejorar la oferta.');
     }
 
     function contactForm() {
