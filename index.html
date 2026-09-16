@@ -1578,17 +1578,8 @@ Quiero entender bien la diferencia y revisar si podemos mejorar la propuesta de 
     }
 
     function contactForm() {
-      const email = prompt('¿Cuál es tu email?', '');
-      if (!email) return;
-      
-      const phone = prompt('¿Cuál es tu teléfono? (opcional)', '');
-      
-      const message = `Quiero ser contactado sobre ADOS Simulador.\nVolumen: ${state.volume.informes} informes + ${state.volume.procesos} procesos\nAhorro: ${fmt(calcAnnualSavings())} UF (${calcSavingsPercent().toFixed(1)}%)\nEmail: ${email}${phone ? '\nTeléfono: ' + phone : ''}`;
-      
-      // Enviar a WhatsApp de ADOS
-      window.open('https://wa.me/56945696216?text=' + encodeURIComponent(message), '_blank');
-      
-      alert('✅ Tu información se ha compartido. Nos contactaremos pronto.');
+      // Mismo flujo que contactExecutive - abre el modal con nombre + factoring
+      openExecutiveModal();
     }
 
     function validateInputs() {
