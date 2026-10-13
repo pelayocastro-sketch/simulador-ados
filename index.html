@@ -964,6 +964,11 @@
             <input type="tel" id="contactTelefono" placeholder="+56 9 1234 5678" required style="width: 100%; padding: 10px; border: 1px solid var(--ados-border); border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--ados-hueso); font-size: 14px;">
           </div>
 
+          <div class="form-group" style="margin-top: 16px;">
+            <label>Tu factoring o empresa *</label>
+            <input type="text" id="contactFactoring" placeholder="Ej: ABC Factoring" required style="width: 100%; padding: 10px; border: 1px solid var(--ados-border); border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--ados-hueso); font-size: 14px;">
+          </div>
+
           <button class="btn-primary" onclick="saveContactAndContinue()" style="margin-top: 30px;">Continuar →</button>
         </div>
       </div>
@@ -1622,6 +1627,7 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
         const { error } = await supabase
           .from('simulador_clientes')
           .update({
+            factoring: state.provider.factoring || clientData.factoring || 'N/A',
             volumen_informes: state.volume.informes,
             volumen_procesos: state.volume.procesos,
             proveedor_informe: state.provider.informe,
@@ -1629,12 +1635,17 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
             ahorro_anual_uf: savings,
             ahorro_anual_clp: Math.round(savingsCLP),
             ahorro_porcentaje: savingsPercent,
-            cotizacion_guardada: true
+            cotizacion_guardada: true,
+            updated_at: new Date().toISOString()
           })
           .eq('email', clientData.email);
 
-        if (!error) {
-          console.log('✅ Datos finales guardados en Supabase');
+        if (error) {
+          console.error('❌ Error actualizando datos:', error);
+          return;
+        }
+
+        console.log('✅ Datos finales guardados en Supabase');
 
           // Enviar notificación WhatsApp automática
           const message = `✅ ${clientData.nombre} de ${clientData.factoring}
@@ -1998,8 +2009,9 @@ Contacto: ${clientData.telefono}`;
       const nombre = document.getElementById('contactNombre').value.trim();
       const email = document.getElementById('contactEmail').value.trim();
       const telefono = document.getElementById('contactTelefono').value.trim();
+      const factoring = document.getElementById('contactFactoring').value.trim();
 
-      if (!nombre || !email || !telefono) {
+      if (!nombre || !email || !telefono || !factoring) {
         alert('⚠️ Por favor completa todos los campos');
         return;
       }
@@ -2009,12 +2021,15 @@ Contacto: ${clientData.telefono}`;
         nombre: nombre,
         email: email,
         telefono: telefono,
-        factoring: state.provider.factoring || '',
+        factoring: factoring,
         ip_cliente: 'N/A',
         navegador: navigator.userAgent.substring(0, 100),
         dispositivo: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
         created_at: new Date().toISOString()
       };
+
+      // También actualizar state para que esté disponible después
+      state.provider.factoring = factoring;
 
       // Guardar en Supabase (captura inicial)
       try {
