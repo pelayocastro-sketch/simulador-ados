@@ -321,6 +321,7 @@
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let allData = [];
+    let realtimeSubscription = null; // Mantener suscripción única
 
     function checkPassword() {
       const password = document.getElementById('passwordInput').value;
@@ -348,37 +349,77 @@
 
     async function loadData() {
       try {
+        console.log('📍 loadData() - Cargando datos de Supabase...');
         const { data, error } = await supabase
           .from('simulador_clientes')
           .select('*')
           .order('created_at', { ascending: false });
 
         if (error) {
+          console.error('❌ Error en Supabase:', error);
           showError('Error al cargar datos: ' + error.message);
           return;
         }
 
+        console.log(`✅ ${data?.length || 0} registros cargados de Supabase`);
         allData = data || [];
         updateStats();
         renderTable(allData);
-        enableRealtimeSubscription();
+
+        // Solo crear suscripción una vez
+        if (!realtimeSubscription) {
+          console.log('📡 Inicializando suscripción de tiempo real...');
+          enableRealtimeSubscription();
+        }
       } catch (e) {
+        console.error('❌ Error en loadData():', e);
         showError('Error: ' + e.message);
       }
     }
 
     function enableRealtimeSubscription() {
-      const subscription = supabase
-        .channel('simulador_clientes_changes')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'simulador_clientes' },
-          (payload) => {
-            console.log('✅ Nuevo evento en tiempo real:', payload);
-            loadData(); // Recargar datos automáticamente
-          }
-        )
-        .subscribe();
+      try {
+        console.log('🔌 Conectando a canal de realtime...');
+
+        // Si ya hay suscripción, desuscribirse primero
+        if (realtimeSubscription) {
+          console.log('📴 Desuscribiendo suscripción anterior...');
+          supabase.removeChannel(realtimeSubscription);
+        }
+
+        realtimeSubscription = supabase
+          .channel('simulador_clientes_changes', {
+            config: {
+              broadcast: { self: true },
+              presence: { key: 'dashboard' }
+            }
+          })
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'simulador_clientes'
+            },
+            (payload) => {
+              console.log('✅ EVENTO EN TIEMPO REAL:', payload.eventType, payload.new || payload.old);
+              // Recargar datos sin recrear suscripción
+              loadData();
+            }
+          )
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              console.log('✅ Suscripción activa - Escuchando cambios...');
+            } else if (status === 'CHANNEL_ERROR') {
+              console.error('❌ Error en canal de realtime');
+            } else if (status === 'TIMED_OUT') {
+              console.warn('⚠️ Timeout en suscripción, reintentando...');
+              setTimeout(() => enableRealtimeSubscription(), 5000);
+            }
+          });
+      } catch (e) {
+        console.error('❌ Error en enableRealtimeSubscription():', e);
+      }
     }
 
     function updateStats() {
