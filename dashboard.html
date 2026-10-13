@@ -444,7 +444,7 @@
         return;
       }
 
-      tbody.innerHTML = data.map(row => `
+      tbody.innerHTML = data.map((row, idx) => `
         <tr>
           <td>${row.nombre || '-'}</td>
           <td>${row.email || '-'}</td>
@@ -459,7 +459,7 @@
           <td>${new Date(row.created_at).toLocaleDateString('es-CL')}</td>
           <td><span class="status-badge">✅ Completado</span></td>
           <td style="text-align: center;">
-            <button onclick="deleteRecord('${row.email}')" style="background: rgba(220, 38, 38, 0.2); color: #fca5a5; border: 1px solid #fca5a5; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">🗑️ Eliminar</button>
+            <button id="del-${idx}" onclick="deleteByIndex(${idx})" style="background: rgba(220, 38, 38, 0.2); color: #fca5a5; border: 1px solid #fca5a5; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">🗑️ Eliminar</button>
           </td>
         </tr>
       `).join('');
@@ -487,27 +487,38 @@
       loadData();
     }
 
-    async function deleteRecord(email) {
-      if (!confirm(`¿Eliminar simulación de ${email}?`)) {
+    async function deleteByIndex(idx) {
+      const row = allData[idx];
+      if (!row) {
+        showError('Registro no encontrado');
+        return;
+      }
+
+      if (!confirm(`¿Eliminar simulación de ${row.email}?`)) {
         return;
       }
 
       try {
+        console.log(`🗑️ Eliminando registro con ID: ${row.id}, Email: ${row.email}`);
+
+        // Eliminar por ID (más seguro que por email)
         const { error } = await supabase
           .from('simulador_clientes')
           .delete()
-          .eq('email', email);
+          .eq('id', row.id);
 
         if (error) {
+          console.error('❌ Error en Supabase:', error);
           showError('Error al eliminar: ' + error.message);
           return;
         }
 
-        console.log('✅ Simulación eliminada');
-        loadData(); // Recargar tabla
+        console.log('✅ Simulación eliminada exitosamente');
+        showError('✅ Simulación eliminada'); // Mostra éxito temporal
+        setTimeout(() => loadData(), 500); // Recargar tabla después de 500ms
       } catch (e) {
-        console.error('Error:', e);
-        showError('Error al eliminar');
+        console.error('❌ Error en deleteByIndex():', e);
+        showError('Error al eliminar: ' + e.message);
       }
     }
 
