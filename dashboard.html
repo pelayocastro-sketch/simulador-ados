@@ -361,9 +361,24 @@
         allData = data || [];
         updateStats();
         renderTable(allData);
+        enableRealtimeSubscription();
       } catch (e) {
         showError('Error: ' + e.message);
       }
+    }
+
+    function enableRealtimeSubscription() {
+      const subscription = supabase
+        .channel('simulador_clientes_changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'simulador_clientes' },
+          (payload) => {
+            console.log('✅ Nuevo evento en tiempo real:', payload);
+            loadData(); // Recargar datos automáticamente
+          }
+        )
+        .subscribe();
     }
 
     function updateStats() {

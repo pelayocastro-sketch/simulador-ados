@@ -942,6 +942,31 @@
         </div>
       </div>
 
+      <!-- SCREEN 0.5: CONTACTO -->
+      <div class="screen" id="screen-contact">
+        <h2>Queremos conocerte mejor</h2>
+        <p class="screen-subtitle">Cuéntanos cómo contactarte para mejorar tu propuesta</p>
+
+        <div style="max-width: 500px; margin: 40px auto;">
+          <div class="form-group">
+            <label>Tu nombre *</label>
+            <input type="text" id="contactNombre" placeholder="Ej: Juan García" required style="width: 100%; padding: 10px; border: 1px solid var(--ados-border); border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--ados-hueso); font-size: 14px;">
+          </div>
+
+          <div class="form-group" style="margin-top: 16px;">
+            <label>Tu email *</label>
+            <input type="email" id="contactEmail" placeholder="ej: tu@empresa.com" required style="width: 100%; padding: 10px; border: 1px solid var(--ados-border); border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--ados-hueso); font-size: 14px;">
+          </div>
+
+          <div class="form-group" style="margin-top: 16px;">
+            <label>Tu teléfono *</label>
+            <input type="tel" id="contactTelefono" placeholder="+56 9 1234 5678" required style="width: 100%; padding: 10px; border: 1px solid var(--ados-border); border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--ados-hueso); font-size: 14px;">
+          </div>
+
+          <button class="btn-primary" onclick="saveContactAndContinue()" style="margin-top: 30px;">Continuar →</button>
+        </div>
+      </div>
+
       <!-- SCREEN 1: VOLUMEN -->
       <div class="screen" id="screen-1">
         <h2>¿Cuánto procesa tu equipo?</h2>
@@ -1577,6 +1602,50 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
       }
     }
 
+    // TRACKING: Guardar datos finales y notificar
+    async function saveFinalDataAndNotify() {
+      if (!clientData.email) return; // Sin email, no guardar
+
+      const savings = calcAnnualSavings();
+      const savingsPercent = calcSavingsPercent();
+      const savingsCLP = savings * UF_VALUE;
+
+      try {
+        // Actualizar registro en Supabase
+        const { error } = await supabase
+          .from('simulador_clientes')
+          .update({
+            volumen_informes: state.volume.informes,
+            volumen_procesos: state.volume.procesos,
+            proveedor_informe: state.provider.informe,
+            proveedor_proceso: state.provider.proceso,
+            ahorro_anual_uf: savings,
+            ahorro_anual_clp: Math.round(savingsCLP),
+            ahorro_porcentaje: savingsPercent,
+            cotizacion_guardada: true
+          })
+          .eq('email', clientData.email);
+
+        if (!error) {
+          console.log('✅ Datos finales guardados en Supabase');
+
+          // Enviar notificación WhatsApp automática
+          const message = `✅ ${clientData.nombre} de ${clientData.factoring}
+
+Vio un ahorro de:
+💚 $${Math.round(savingsCLP).toLocaleString('es-CL')}
+(${savingsPercent.toFixed(1)}% de ahorro anual)
+
+Contacto: ${clientData.telefono}`;
+
+          // Abrir WhatsApp silenciosamente
+          window.open(`https://wa.me/56945696216?text=${encodeURIComponent(message)}`, '_blank');
+        }
+      } catch (e) {
+        console.error('Error guardando datos finales:', e);
+      }
+    }
+
     function contactForm() {
       // Mismo flujo que contactExecutive - abre el modal con nombre + factoring
       openExecutiveModal();
@@ -1904,6 +1973,8 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
       // Actualizar CTA basado en ahorros
       if (currentScreen === 6) {
         updateCTABasedOnSavings();
+        // Guardar datos finales y notificar a Pelayo
+        setTimeout(() => saveFinalDataAndNotify(), 500);
       }
     }
 
@@ -1915,12 +1986,61 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
       return '$' + Math.round(n).toLocaleString('es-CL');
     }
 
-    function nextScreen() { 
+    // TRACKING: Guardar contacto y continuar
+    async function saveContactAndContinue() {
+      const nombre = document.getElementById('contactNombre').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const telefono = document.getElementById('contactTelefono').value.trim();
+
+      if (!nombre || !email || !telefono) {
+        alert('⚠️ Por favor completa todos los campos');
+        return;
+      }
+
+      // Guardar en cliente global
+      clientData = {
+        nombre: nombre,
+        email: email,
+        telefono: telefono,
+        factoring: state.provider.factoring || '',
+        ip_cliente: 'N/A',
+        navegador: navigator.userAgent.substring(0, 100),
+        dispositivo: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
+      };
+
+      // Guardar en Supabase (captura inicial)
+      try {
+        const { data, error } = await supabase
+          .from('simulador_clientes')
+          .insert([clientData]);
+
+        if (error) {
+          console.error('Error guardando contacto:', error);
+        } else {
+          console.log('✅ Contacto guardado en Supabase');
+        }
+      } catch (e) {
+        console.error('Error Supabase:', e);
+      }
+
+      // Avanzar a volumen
+      currentScreen = 1;
+      updateScreen();
+    }
+
+    function nextScreen() {
+      // Si está en intro (screen 0), mostrar contacto
+      if (currentScreen === 0) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-contact').classList.add('active');
+        return;
+      }
+
       console.log('nextScreen() - currentScreen:', currentScreen);
-      if (currentScreen === 0 || (validateInputs() && currentScreen < 6)) { 
-        currentScreen++; 
+      if (validateInputs() && currentScreen < 7) {
+        currentScreen++;
         console.log('Avanzando a screen:', currentScreen);
-        updateScreen(); 
+        updateScreen();
       } else {
         console.log('No se puede avanzar - validación fallida');
       }
