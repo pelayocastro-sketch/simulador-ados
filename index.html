@@ -1647,8 +1647,8 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
 
         console.log('✅ Datos finales guardados en Supabase');
 
-          // Enviar notificación WhatsApp automática
-          const message = `✅ ${clientData.nombre} de ${clientData.factoring}
+        // Enviar notificación WhatsApp automática
+        const message = `✅ ${clientData.nombre} de ${clientData.factoring}
 
 Vio un ahorro de:
 💚 $${Math.round(savingsCLP).toLocaleString('es-CL')}
@@ -1656,9 +1656,8 @@ Vio un ahorro de:
 
 Contacto: ${clientData.telefono}`;
 
-          // Abrir WhatsApp silenciosamente
-          window.open(`https://wa.me/56945696216?text=${encodeURIComponent(message)}`, '_blank');
-        }
+        // Abrir WhatsApp silenciosamente
+        window.open(`https://wa.me/56945696216?text=${encodeURIComponent(message)}`, '_blank');
       } catch (e) {
         console.error('Error guardando datos finales:', e);
       }
