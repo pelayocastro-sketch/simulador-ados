@@ -1,7 +1,4 @@
 {
   "buildCommand": "echo 'Static HTML'",
-  "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "outputDirectory": "."
 }
