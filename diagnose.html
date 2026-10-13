@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔍 Diagnóstico - ADOS Simulador</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #0a0a0a;
+      color: #00ff00;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .ok { color: #00ff00; }
+    .error { color: #ff0000; }
+    .warn { color: #ffff00; }
+    .section { margin: 20px 0; border: 1px solid #00ff00; padding: 10px; }
+    h2 { border-bottom: 2px solid #00ff00; }
+    code { background: #1a1a1a; padding: 2px 5px; }
+    button {
+      background: #00ff00;
+      color: #000;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 DIAGNÓSTICO DEL SIMULADOR ADOS</h1>
+
+  <div class="section">
+    <h2>1. Verificación de Variables Globales</h2>
+    <div id="vars-check"></div>
+  </div>
+
+  <div class="section">
+    <h2>2. Verificación de Funciones</h2>
+    <div id="funcs-check"></div>
+  </div>
+
+  <div class="section">
+    <h2>3. Verificación de DOM</h2>
+    <div id="dom-check"></div>
+  </div>
+
+  <div class="section">
+    <h2>4. Test Interactivo</h2>
+    <button onclick="testNextScreen()">🧪 Test nextScreen()</button>
+    <button onclick="testSaveContact()">🧪 Test saveContactAndContinue()</button>
+    <button onclick="testSupabase()">🧪 Test Supabase</button>
+    <div id="test-results"></div>
+  </div>
+
+  <div class="section">
+    <h2>5. Consola del Navegador</h2>
+    <p>Abre la consola (F12) y busca mensajes de error</p>
+    <button onclick="simulateClick()">🧪 Simular click en "Calcular mi ahorro"</button>
+  </div>
+
+  <script>
+    const log = (id, msg, type = 'ok') => {
+      const el = document.getElementById(id);
+      const color = type === 'ok' ? 'ok' : type === 'error' ? 'error' : 'warn';
+      el.innerHTML += `<div class="${color}">${msg}</div>`;
+    };
+
+    // Check variables
+    window.addEventListener('load', () => {
+      console.log('===== INICIANDO DIAGNÓSTICO =====');
+
+      // 1. Variables
+      console.log('Checking variables...');
+      log('vars-check', '✅ Página cargada', 'ok');
+
+      if (typeof currentScreen !== 'undefined') {
+        log('vars-check', `✅ currentScreen = ${currentScreen}`, 'ok');
+      } else {
+        log('vars-check', '❌ currentScreen NO está definido', 'error');
+      }
+
+      if (typeof clientData !== 'undefined') {
+        log('vars-check', `✅ clientData definido`, 'ok');
+      } else {
+        log('vars-check', '❌ clientData NO está definido', 'error');
+      }
+
+      if (typeof state !== 'undefined') {
+        log('vars-check', `✅ state definido`, 'ok');
+      } else {
+        log('vars-check', '❌ state NO está definido', 'error');
+      }
+
+      if (typeof supabase !== 'undefined') {
+        log('vars-check', `✅ supabase inicializado`, 'ok');
+      } else {
+        log('vars-check', '❌ supabase NO está definido', 'warn');
+      }
+
+      // 2. Funciones
+      console.log('Checking functions...');
+      const funcs = ['nextScreen', 'updateScreen', 'saveContactAndContinue', 'saveFinalDataAndNotify', 'updateCalcs'];
+      funcs.forEach(f => {
+        if (typeof window[f] === 'function') {
+          log('funcs-check', `✅ ${f}() existe`, 'ok');
+        } else {
+          log('funcs-check', `❌ ${f}() NO EXISTE`, 'error');
+        }
+      });
+
+      // 3. DOM
+      console.log('Checking DOM...');
+      const doms = [
+        'screen-0',
+        'screen-contact',
+        'contactNombre',
+        'contactEmail',
+        'contactTelefono',
+        'contactFactoring'
+      ];
+      doms.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          log('dom-check', `✅ #${id} existe`, 'ok');
+        } else {
+          log('dom-check', `❌ #${id} NO EXISTE`, 'error');
+        }
+      });
+    });
+
+    function testNextScreen() {
+      console.log('📍 Test nextScreen() iniciado');
+      document.getElementById('test-results').innerHTML = '';
+      try {
+        if (typeof nextScreen !== 'function') {
+          log('test-results', '❌ nextScreen() no es una función', 'error');
+          return;
+        }
+        log('test-results', '✅ Llamando nextScreen()...', 'ok');
+        nextScreen();
+        log('test-results', '✅ nextScreen() ejecutada sin errores', 'ok');
+        log('test-results', `📍 currentScreen ahora es: ${currentScreen}`, 'warn');
+      } catch (e) {
+        log('test-results', `❌ ERROR: ${e.message}`, 'error');
+        log('test-results', `📍 Stack: ${e.stack}`, 'error');
+      }
+    }
+
+    function testSaveContact() {
+      console.log('📍 Test saveContactAndContinue() iniciado');
+      document.getElementById('test-results').innerHTML = '';
+      try {
+        // Llenar campos
+        document.getElementById('contactNombre').value = 'Test User';
+        document.getElementById('contactEmail').value = 'test@example.com';
+        document.getElementById('contactTelefono').value = '+56 9 1234 5678';
+        document.getElementById('contactFactoring').value = 'Test Factoring';
+
+        log('test-results', '✅ Campos llenados', 'ok');
+        log('test-results', '✅ Llamando saveContactAndContinue()...', 'ok');
+
+        saveContactAndContinue();
+
+        log('test-results', '✅ saveContactAndContinue() ejecutada', 'ok');
+      } catch (e) {
+        log('test-results', `❌ ERROR: ${e.message}`, 'error');
+      }
+    }
+
+    function testSupabase() {
+      console.log('📍 Test Supabase iniciado');
+      document.getElementById('test-results').innerHTML = '';
+      try {
+        if (typeof supabase === 'undefined') {
+          log('test-results', '❌ Supabase NO está inicializado', 'error');
+          return;
+        }
+        log('test-results', '✅ Supabase está disponible', 'ok');
+        log('test-results', `✅ SUPABASE_URL: ${SUPABASE_URL.substring(0, 30)}...`, 'ok');
+        log('test-results', '✅ Supabase Client configurado correctamente', 'ok');
+      } catch (e) {
+        log('test-results', `❌ ERROR: ${e.message}`, 'error');
+      }
+    }
+
+    function simulateClick() {
+      console.log('📍 Simulando click en botón "Calcular mi ahorro"');
+      document.getElementById('test-results').innerHTML = '';
+      try {
+        const btn = document.querySelector('[onclick="nextScreen()"]');
+        if (!btn) {
+          log('test-results', '❌ No se encontró el botón', 'error');
+          return;
+        }
+        log('test-results', '✅ Botón encontrado', 'ok');
+        log('test-results', '✅ Disparando evento click...', 'ok');
+        btn.click();
+        log('test-results', '✅ Click disparado sin errores', 'ok');
+      } catch (e) {
+        log('test-results', `❌ ERROR: ${e.message}`, 'error');
+      }
+    }
+  </script>
+
+  <!-- Importar el simulador para que cargue las variables -->
+  <iframe src="index.html" style="display: none;"></iframe>
+
+</body>
+</html>
