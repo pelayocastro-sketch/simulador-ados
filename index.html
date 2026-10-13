@@ -1616,18 +1616,37 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
 
     // TRACKING: Guardar datos finales y notificar
     async function saveFinalDataAndNotify() {
-      if (!clientData.email) return; // Sin email, no guardar
+      console.log('📍 saveFinalDataAndNotify() llamado');
+
+      if (!clientData.email) {
+        console.warn('⚠️ No hay email en clientData, no se puede guardar');
+        return;
+      }
 
       const savings = calcAnnualSavings();
       const savingsPercent = calcSavingsPercent();
       const savingsCLP = savings * UF_VALUE;
 
+      console.log('📊 Valores calculados:', {
+        savings,
+        savingsPercent,
+        savingsCLP: Math.round(savingsCLP),
+        email: clientData.email,
+        nombre: clientData.nombre,
+        factoring: clientData.factoring
+      });
+
       try {
+        if (!supabase) {
+          console.error('❌ Supabase no está inicializado');
+          return;
+        }
+
         // Actualizar registro en Supabase
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('simulador_clientes')
           .update({
-            factoring: state.provider.factoring || clientData.factoring || 'N/A',
+            factoring: clientData.factoring || 'N/A',
             volumen_informes: state.volume.informes,
             volumen_procesos: state.volume.procesos,
             proveedor_informe: state.provider.informe,
@@ -1641,11 +1660,14 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
           .eq('email', clientData.email);
 
         if (error) {
-          console.error('❌ Error actualizando datos:', error);
+          console.error('❌ Error en Supabase:', error);
           return;
         }
 
-        console.log('✅ Datos finales guardados en Supabase');
+        console.log('✅ Datos actualizados en Supabase:', {
+          ahorro_anual_clp: Math.round(savingsCLP),
+          ahorro_porcentaje: savingsPercent
+        });
 
         // Enviar notificación WhatsApp automática
         const message = `✅ ${clientData.nombre} de ${clientData.factoring}
@@ -1656,10 +1678,10 @@ Vio un ahorro de:
 
 Contacto: ${clientData.telefono}`;
 
-        // Abrir WhatsApp silenciosamente
+        console.log('📱 Enviando notificación WhatsApp...');
         window.open(`https://wa.me/56945696216?text=${encodeURIComponent(message)}`, '_blank');
       } catch (e) {
-        console.error('Error guardando datos finales:', e);
+        console.error('❌ Error en saveFinalDataAndNotify():', e);
       }
     }
 
@@ -1989,9 +2011,14 @@ Contacto: ${clientData.telefono}`;
       
       // Actualizar CTA basado en ahorros
       if (currentScreen === 6) {
+        console.log('🎯 En pantalla 6 (resultado) - Guardando datos finales...');
         updateCTABasedOnSavings();
         // Guardar datos finales y notificar a Pelayo
-        setTimeout(() => saveFinalDataAndNotify(), 500);
+        // Aumentar delay a 1000ms para asegurar que todo esté listo
+        setTimeout(() => {
+          console.log('⏱️ Ejecutando saveFinalDataAndNotify después de 1s');
+          saveFinalDataAndNotify();
+        }, 1000);
       }
     }
 
