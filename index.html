@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ADOS Simulador</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='25' y='25' width='50' height='50' rx='8' fill='%2333D98B' transform='rotate(45 50 50)'/%3E%3C/svg%3E">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -1361,6 +1362,12 @@
   </div>
 
   <script>
+    // ========== SUPABASE INITIALIZATION ==========
+    const SUPABASE_URL = 'https://yvuwkmmwkvvwnouvomph.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2dXdrbW13a3Z2d25vdXZvbXBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MDgzNDgsImV4cCI6MjEwNzQ4NDM0OH0.Yzd_J3ZcKl8yTiMxF32i_CZP_5pgPcZp67Mpb8ebHrg';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let clientData = {}; // Global para almacenar datos de contacto
+
     const UF_VALUE = 40867.18;
     const ADOS_PRICING = { informe: 0.7, proceso: 1.0 };
 
@@ -2005,7 +2012,8 @@ Contacto: ${clientData.telefono}`;
         factoring: state.provider.factoring || '',
         ip_cliente: 'N/A',
         navegador: navigator.userAgent.substring(0, 100),
-        dispositivo: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
+        dispositivo: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+        created_at: new Date().toISOString()
       };
 
       // Guardar en Supabase (captura inicial)
