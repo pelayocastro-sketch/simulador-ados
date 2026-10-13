@@ -1623,6 +1623,17 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
         return;
       }
 
+      // ✅ Actualizar state.provider desde inputs ANTES de guardar
+      const provInfInput = document.getElementById('prov-informe');
+      const provProcInput = document.getElementById('prov-proceso');
+
+      if (provInfInput) {
+        state.provider.informe = parseFloat(provInfInput.value) || state.provider.informe;
+      }
+      if (provProcInput) {
+        state.provider.proceso = parseFloat(provProcInput.value) || state.provider.proceso;
+      }
+
       const savings = calcAnnualSavings();
       const savingsPercent = calcSavingsPercent();
       const savingsCLP = savings * UF_VALUE;
