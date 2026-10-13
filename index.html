@@ -1665,6 +1665,10 @@ He revisado los precios y me interesa poder reunirnos para hablar de cómo mejor
         }
 
         console.log('✅ Datos actualizados en Supabase:', {
+          volumen_informes: state.volume.informes,
+          volumen_procesos: state.volume.procesos,
+          proveedor_informe: state.provider.informe,
+          proveedor_proceso: state.provider.proceso,
           ahorro_anual_clp: Math.round(savingsCLP),
           ahorro_porcentaje: savingsPercent
         });
