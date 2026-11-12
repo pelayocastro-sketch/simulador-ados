@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ADOS - Admin Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
   <style>
     :root {
       --ados-tinta: #0E1013;
@@ -13,6 +15,9 @@
       --ados-hueso: #F2F4F1;
       --ados-text-secondary: #9BA1A6;
       --ados-border: #1E2227;
+      --ados-panel: #14171B;
+      --ados-s2: #33D98B;
+      --ados-s3: #E8B04B;
     }
 
     * {
@@ -22,7 +27,7 @@
     }
 
     html, body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--ados-tinta);
       color: var(--ados-hueso);
       line-height: 1.6;
@@ -70,6 +75,8 @@
       color: var(--ados-text-secondary);
       margin-bottom: 6px;
       text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
     }
 
     .form-group input {
@@ -121,6 +128,7 @@
     .header h1 {
       font-size: 24px;
       color: var(--ados-verde);
+      font-weight: 700;
     }
 
     .logout-btn {
@@ -149,9 +157,10 @@
       color: var(--ados-text-secondary);
       cursor: pointer;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       border-bottom: 2px solid transparent;
       transition: all 0.3s ease;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
     .tab-btn:hover {
@@ -172,7 +181,7 @@
     }
 
     .stat-card {
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--ados-panel);
       border: 1px solid var(--ados-border);
       border-radius: 8px;
       padding: 20px;
@@ -180,16 +189,20 @@
     }
 
     .stat-card .label {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--ados-text-secondary);
       margin-bottom: 8px;
       text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      font-weight: 600;
     }
 
     .stat-card .value {
       font-size: 32px;
       font-weight: 700;
       color: var(--ados-verde);
+      font-family: 'JetBrains Mono', monospace;
     }
 
     /* FILTERS */
@@ -208,6 +221,7 @@
       color: var(--ados-hueso);
       font-size: 12px;
       cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
     /* TABLE */
@@ -233,11 +247,16 @@
       text-align: left;
       font-weight: 600;
       color: var(--ados-verde);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px;
+      font-size: 11px;
+      text-transform: uppercase;
     }
 
     td {
       padding: 12px;
       border-bottom: 1px solid var(--ados-border);
+      font-family: 'JetBrains Mono', monospace;
     }
 
     tbody tr:hover {
@@ -276,7 +295,7 @@
 
     /* SIMULADOR REFERIDOS */
     .simulator-section {
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--ados-panel);
       border: 1px solid var(--ados-border);
       border-radius: 16px;
       padding: 32px;
@@ -295,11 +314,13 @@
 
     .sim-label {
       display: block;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       color: var(--ados-verde);
       margin-bottom: 7px;
       text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
     }
 
     .sim-input {
@@ -307,10 +328,11 @@
       padding: 12px;
       border: 1px solid var(--ados-border);
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 14px;
       color: var(--ados-hueso);
       background: rgba(255, 255, 255, 0.05);
       font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
     }
 
     .sim-input:focus {
@@ -320,7 +342,7 @@
     }
 
     .result-box {
-      background: rgba(16, 185, 129, 0.1);
+      background: rgba(28, 141, 91, 0.1);
       border: 1px solid var(--ados-verde);
       border-radius: 16px;
       padding: 24px;
@@ -330,17 +352,19 @@
     }
 
     .result-label {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--ados-verde);
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 1px;
+      font-family: 'JetBrains Mono', monospace;
     }
 
     .result-amount {
       font-size: 48px;
-      font-weight: 900;
+      font-weight: 700;
       color: var(--ados-verde);
+      font-family: 'JetBrains Mono', monospace;
     }
 
     .result-metric {
@@ -349,6 +373,7 @@
       padding: 12px 0;
       border-top: 1px solid rgba(51, 217, 139, 0.2);
       font-size: 13px;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
     .result-metric span {
@@ -358,12 +383,40 @@
     .result-metric strong {
       color: var(--ados-verde);
       text-align: right;
+      font-family: 'JetBrains Mono', monospace;
     }
 
     .subnote {
       font-size: 12px;
       color: var(--ados-text-secondary);
       margin-top: 6px;
+    }
+
+    .conditions-box {
+      background: rgba(51, 217, 139, 0.05);
+      border: 1px solid var(--ados-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+
+    .conditions-box h3 {
+      color: var(--ados-verde);
+      margin: 0 0 14px;
+      font-size: 16px;
+    }
+
+    .conditions-box ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--ados-text-secondary);
+      font-size: 13px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .conditions-box li {
+      line-height: 1.5;
     }
 
     @media(max-width:720px){
@@ -458,8 +511,8 @@
     <!-- TAB 2: PROGRAMA REFERIDOS -->
     <div id="referidos-tab" class="tab-content" style="display: none;">
       <div class="simulator-section">
-        <h2 style="color: var(--ados-verde); margin-bottom: 8px;">💰 Simulador de Comisiones</h2>
-        <p style="color: var(--ados-text-secondary); margin-bottom: 24px;">Calcula cuánto ganas refiriendo un cliente a ADOS</p>
+        <h2 style="color: var(--ados-verde); margin-bottom: 8px; font-size: 22px;">💰 Calculador de Comisiones</h2>
+        <p style="color: var(--ados-text-secondary); margin-bottom: 24px; font-size: 14px;">Simula cuánto ganas refiriendo un cliente a ADOS</p>
 
         <div class="simulator-grid">
           <!-- INPUT -->
@@ -508,13 +561,16 @@
         </div>
       </div>
 
-      <div style="background: rgba(51, 217, 139, 0.1); border: 1px solid var(--ados-border); border-radius: 12px; padding: 20px; margin-top: 24px;">
-        <h3 style="color: var(--ados-verde); margin: 0 0 12px;">ℹ️ Condiciones</h3>
-        <ul style="margin: 0; padding-left: 20px; color: var(--ados-text-secondary); font-size: 13px;">
-          <li>Cliente debe ser nuevo (no en pipeline ADOS)</li>
-          <li>Comisión es 20% de lo neto cobrado durante 6 meses</li>
-          <li>Se paga mensualmente después de cobro confirmado</li>
-          <li>Vigencia: 6 meses desde primera factura pagada</li>
+      <!-- CONDICIONES -->
+      <div class="conditions-box">
+        <h3>📋 Condiciones del Programa</h3>
+        <ul>
+          <li><strong>Comisión:</strong> 20% de lo neto cobrado, por 6 meses desde la primera factura pagada</li>
+          <li><strong>Neto:</strong> sin IVA y sin firma electrónica. No se descuenta nada más</li>
+          <li><strong>Pago:</strong> mensual, después de que cobremos, contra boleta emitida</li>
+          <li><strong>Condición:</strong> si el cliente no paga, no hay comisión por ese período</li>
+          <li><strong>Cliente nuevo:</strong> debe ser cliente nuevo y no estar en el pipeline de ADOS</li>
+          <li><strong>Presentación:</strong> debes hacer la presentación directa con quien toma decisiones</li>
         </ul>
       </div>
     </div>
@@ -562,11 +618,9 @@
 
     // TABS
     function switchTab(tabName) {
-      // Hide all tabs
       document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
-      // Show selected tab
       document.getElementById(tabName + '-tab').style.display = 'block';
       event.target.classList.add('active');
     }
